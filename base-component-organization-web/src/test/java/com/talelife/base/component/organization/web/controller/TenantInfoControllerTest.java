@@ -40,15 +40,6 @@ public class TenantInfoControllerTest extends AbstractControllerTest{
 		mvc.perform(post("/web/tenantInfo/login", JSON.toJSONString(tenant))).andExpect(MockMvcResultMatchers.status().isOk())
 		.andDo(MockMvcResultHandlers.print());
 	}
-	@Test
-	public void testLogin() throws Exception{
-		//{"account":"dev652@qq.com","password":"123"}
-		TenantLoginVO tenant = new TenantLoginVO();
-		tenant.setAccount("dev652@qq.com");
-		tenant.setPassword("123");
-		mvc.perform(post("/web/tenantInfo/login", JSON.toJSONString(tenant))).andExpect(MockMvcResultMatchers.status().isOk())
-		.andDo(MockMvcResultHandlers.print());
-	}
 	
 	@Test
 	public void test1003Stop() throws Exception{
@@ -67,6 +58,17 @@ public class TenantInfoControllerTest extends AbstractControllerTest{
 		PageQueryParameter<TenantInfoQuery> pageQuery = new PageQueryParameter<>();
 		pageQuery.setQuery(new TenantInfoQuery());
 		mvc.perform(post("/web/tenantInfo/page/",JSON.toJSONString(pageQuery))).andExpect(MockMvcResultMatchers.status().isOk())
+		.andDo(MockMvcResultHandlers.print());
+	}
+	
+	/******************** 临时测试 *********************************/
+	@Test
+	public void testLogin() throws Exception{
+		//{"account":"dev652@qq.com","password":"123"}
+		TenantLoginVO tenant = new TenantLoginVO();
+		tenant.setAccount("dev652@qq.com");
+		tenant.setPassword("123");
+		mvc.perform(post("/web/tenantInfo/login", JSON.toJSONString(tenant))).andExpect(MockMvcResultMatchers.status().isOk())
 		.andDo(MockMvcResultHandlers.print());
 	}
 }
