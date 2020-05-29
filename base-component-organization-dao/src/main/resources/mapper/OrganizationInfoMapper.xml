@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.talelife.base.component.organization.dao.OrganizationInfoMapper">
+
+	<resultMap id="resultMap"
+		type="com.talelife.base.component.organization.dao.entity.OrganizationInfo">
+		<result property="tenantId" column="tenant_id" />
+		<result property="orgId" column="org_id" />
+		<result property="orgName" column="org_name" />
+		<result property="sort" column="sort" />
+		<result property="memberCount" column="member_count" />
+		<result property="parentOrgId" column="parent_org_id" />
+		<result property="idPath" column="id_path" />
+		<result property="namePath" column="name_path" />
+		<result property="isDeleted" column="is_deleted" />
+		<result property="gmtCreate" column="gmt_create" />
+		<result property="gmtModified" column="gmt_modified" />
+	</resultMap>
+
+	<sql id="baseColumns">
+		<choose>
+			<when test="_parameter!=null and _parameter.containsKey('properties')">
+				<trim suffixOverrides=",">
+					<if test="properties.contains('tenantId')">
+						tenant_id,
+					</if>
+					<if test="properties.contains('orgId')">
+						org_id,
+					</if>
+					<if test="properties.contains('orgName')">
+						org_name,
+					</if>
+					<if test="properties.contains('sort')">
+						sort,
+					</if>
+					<if test="properties.contains('memberCount')">
+						member_count,
+					</if>
+					<if test="properties.contains('parentOrgId')">
+						parent_org_id,
+					</if>
+					<if test="properties.contains('idPath')">
+						id_path,
+					</if>
+					<if test="properties.contains('namePath')">
+						name_path,
+					</if>
+					<if test="properties.contains('isDeleted')">
+						is_deleted,
+					</if>
+					<if test="properties.contains('gmtCreate')">
+						gmt_create,
+					</if>
+					<if test="properties.contains('gmtModified')">
+						gmt_modified,
+					</if>
+				</trim>
+			</when>
+			<otherwise>
+				<trim suffixOverrides=",">
+					tenant_id,
+					org_id,
+					org_name,
+					sort,
+					member_count,
+					parent_org_id,
+					id_path,
+					name_path,
+					is_deleted,
+					gmt_create,
+					gmt_modified,
+				</trim>
+			</otherwise>
+		</choose>
+	</sql>
+
+	<sql id="whereSql">
+		<if test="entity.tenantId != null">
+			and tenant_id = #{entity.tenantId}
+		</if>
+		<if test="entity.orgId != null">
+			and org_id = #{entity.orgId}
+		</if>
+		<if test="entity.orgName != null">
+			and org_name = #{entity.orgName}
+		</if>
+		<if test="entity.sort != null">
+			and sort = #{entity.sort}
+		</if>
+		<if test="entity.memberCount != null">
+			and member_count = #{entity.memberCount}
+		</if>
+		<if test="entity.parentOrgId != null">
+			and parent_org_id = #{entity.parentOrgId}
+		</if>
+		<if test="entity.idPath != null">
+			and id_path = #{entity.idPath}
+		</if>
+		<if test="entity.namePath != null">
+			and name_path = #{entity.namePath}
+		</if>
+		<if test="entity.isDeleted != null">
+			and is_deleted = #{entity.isDeleted}
+		</if>
+		<if test="entity.gmtCreate != null">
+			and gmt_create = #{entity.gmtCreate}
+		</if>
+		<if test="entity.gmtModified != null">
+			and gmt_modified = #{entity.gmtModified}
+		</if>
+	</sql>
+
+	<select id="getById" resultMap="resultMap">
+		select
+		<include refid="baseColumns" />
+		from t_organization_info
+		where org_id = #{id}
+	</select>
+
+	<select id="getByIds" resultMap="resultMap">
+		select
+		<include refid="baseColumns" />
+		from t_organization_info
+		where org_id in
+		<foreach collection="ids" item="id" index="index" open="("
+			close=")" separator=",">
+			#{id}
+		</foreach>
+	</select>
+
+	<select id="get" resultMap="resultMap"
+		parameterType="com.talelife.base.component.organization.dao.entity.OrganizationInfo">
+		select
+		<include refid="baseColumns" />
+		from
+		t_organization_info where 1=1
+		<include refid="whereSql" />
+		limit 1
+	</select>
+
+	<select id="findList"
+		parameterType="com.talelife.base.component.organization.dao.entity.OrganizationInfo"
+		resultMap="resultMap">
+		select
+		<include refid="baseColumns" />
+		from t_organization_info where 1=1
+		<include refid="whereSql" />
+	</select>
+
+	<select id="findAll" resultMap="resultMap">
+		select
+		<include refid="baseColumns" />
+		from t_organization_info
+	</select>
+
+	<select id="getCount"
+		parameterType="com.talelife.base.component.organization.dao.entity.OrganizationInfo"
+		resultType="java.lang.Integer">
+		select count(*) from t_organization_info where 1=1
+		<include refid="whereSql" />
+	</select>
+
+	<insert id="save"
+		parameterType="com.talelife.base.component.organization.dao.entity.OrganizationInfo">
+		insert into t_organization_info (
+		<trim suffixOverrides=",">
+			<if test="entity.tenantId != null">
+				tenant_id,
+			</if>
+			<if test="entity.orgId != null">
+				org_id,
+			</if>
+			<if test="entity.orgName != null">
+				org_name,
+			</if>
+			<if test="entity.sort != null">
+				sort,
+			</if>
+			<if test="entity.memberCount != null">
+				member_count,
+			</if>
+			<if test="entity.parentOrgId != null">
+				parent_org_id,
+			</if>
+			<if test="entity.idPath != null">
+				id_path,
+			</if>
+			<if test="entity.namePath != null">
+				name_path,
+			</if>
+			<if test="entity.isDeleted != null">
+				is_deleted,
+			</if>
+			<if test="entity.gmtCreate != null">
+				gmt_create,
+			</if>
+			<if test="entity.gmtModified != null">
+				gmt_modified,
+			</if>
+		</trim>
+		) values (
+		<trim suffixOverrides=",">
+			<if test="entity.tenantId != null">
+				#{entity.tenantId},
+			</if>
+			<if test="entity.orgId != null">
+				#{entity.orgId},
+			</if>
+			<if test="entity.orgName != null">
+				#{entity.orgName},
+			</if>
+			<if test="entity.sort != null">
+				#{entity.sort},
+			</if>
+			<if test="entity.memberCount != null">
+				#{entity.memberCount},
+			</if>
+			<if test="entity.parentOrgId != null">
+				#{entity.parentOrgId},
+			</if>
+			<if test="entity.idPath != null">
+				#{entity.idPath},
+			</if>
+			<if test="entity.namePath != null">
+				#{entity.namePath},
+			</if>
+			<if test="entity.isDeleted != null">
+				#{entity.isDeleted},
+			</if>
+			<if test="entity.gmtCreate != null">
+				#{entity.gmtCreate},
+			</if>
+			<if test="entity.gmtModified != null">
+				#{entity.gmtModified},
+			</if>
+		</trim>
+		)
+	</insert>
+
+	<insert id="batchSave"
+		parameterType="com.talelife.base.component.organization.dao.entity.OrganizationInfo">
+		insert into t_organization_info (
+		<trim suffixOverrides=",">
+			tenant_id,
+			org_id,
+			org_name,
+			sort,
+			member_count,
+			parent_org_id,
+			id_path,
+			name_path,
+			is_deleted,
+			gmt_create,
+			gmt_modified,
+		</trim>
+		) values
+		<foreach collection="entities" item="entity" separator=",">
+			(
+			<trim suffixOverrides=",">
+				#{entity.tenantId},
+				#{entity.orgId},
+				#{entity.orgName},
+				#{entity.sort},
+				#{entity.memberCount},
+				#{entity.parentOrgId},
+				#{entity.idPath},
+				#{entity.namePath},
+				#{entity.isDeleted},
+				#{entity.gmtCreate},
+				#{entity.gmtModified},
+			</trim>
+			)
+		</foreach>
+	</insert>
+
+	<update id="updateById"
+		parameterType="com.talelife.base.component.organization.dao.entity.OrganizationInfo">
+		update t_organization_info set
+		<trim suffixOverrides=",">
+			<if test="entity.tenantId != null">
+				tenant_id = #{entity.tenantId},
+			</if>
+			<if test="entity.orgName != null">
+				org_name = #{entity.orgName},
+			</if>
+			<if test="entity.sort != null">
+				sort = #{entity.sort},
+			</if>
+			<if test="entity.memberCount != null">
+				member_count = #{entity.memberCount},
+			</if>
+			<if test="entity.parentOrgId != null">
+				parent_org_id = #{entity.parentOrgId},
+			</if>
+			<if test="entity.idPath != null">
+				id_path = #{entity.idPath},
+			</if>
+			<if test="entity.namePath != null">
+				name_path = #{entity.namePath},
+			</if>
+			<if test="entity.isDeleted != null">
+				is_deleted = #{entity.isDeleted},
+			</if>
+			<if test="entity.gmtCreate != null">
+				gmt_create = #{entity.gmtCreate},
+			</if>
+			<if test="entity.gmtModified != null">
+				gmt_modified = #{entity.gmtModified},
+			</if>
+		</trim>
+		where org_id = #{entity.orgId}
+	</update>
+
+	<update id="updateByIds"
+		parameterType="com.talelife.base.component.organization.dao.entity.OrganizationInfo">
+		update t_organization_info set
+		<trim suffixOverrides=",">
+			<if test="entity.tenantId != null">
+				tenant_id = #{entity.tenantId},
+			</if>
+			<if test="entity.orgName != null">
+				org_name = #{entity.orgName},
+			</if>
+			<if test="entity.sort != null">
+				sort = #{entity.sort},
+			</if>
+			<if test="entity.memberCount != null">
+				member_count = #{entity.memberCount},
+			</if>
+			<if test="entity.parentOrgId != null">
+				parent_org_id = #{entity.parentOrgId},
+			</if>
+			<if test="entity.idPath != null">
+				id_path = #{entity.idPath},
+			</if>
+			<if test="entity.namePath != null">
+				name_path = #{entity.namePath},
+			</if>
+			<if test="entity.isDeleted != null">
+				is_deleted = #{entity.isDeleted},
+			</if>
+			<if test="entity.gmtCreate != null">
+				gmt_create = #{entity.gmtCreate},
+			</if>
+			<if test="entity.gmtModified != null">
+				gmt_modified = #{entity.gmtModified},
+			</if>
+		</trim>
+		where org_id in
+		<foreach collection="ids" item="item" index="index" open="("
+			close=")" separator=",">
+			#{item}
+		</foreach>
+	</update>
+
+	<delete id="deleteById">
+		delete from t_organization_info
+		where org_id = #{id}
+	</delete>
+
+	<delete id="deleteByIds">
+		delete from t_organization_info
+		where org_id in
+		<foreach collection="ids" item="item" index="index" open="("
+			close=")" separator=",">
+			#{item}
+		</foreach>
+	</delete>
+
+	<delete id="delete"
+		parameterType="com.talelife.base.component.organization.dao.entity.OrganizationInfo">
+		delete from t_organization_info where 1=1
+		<include refid="whereSql" />
+	</delete>
+</mapper>

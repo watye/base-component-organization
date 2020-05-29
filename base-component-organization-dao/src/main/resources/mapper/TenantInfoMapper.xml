@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.talelife.base.component.organization.dao.TenantInfoMapper">
+
+	<resultMap id="resultMap" type="com.talelife.base.component.organization.dao.entity.TenantInfo">
+        <result property="tenantId" column="tenant_id"/>
+        <result property="tenantName" column="tenant_name"/>
+        <result property="password" column="password"/>
+        <result property="passwordSalt" column="password_salt"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="isEnable" column="is_enable"/>
+        <result property="lastLoginTime" column="last_login_time"/>
+        <result property="lastLoginIp" column="last_login_ip"/>
+        <result property="gmtCreate" column="gmt_create"/>
+        <result property="gmtModified" column="gmt_modified"/>
+	</resultMap>
+
+  <sql id="baseColumns">
+  		<choose>
+  			<when test="_parameter!=null and _parameter.containsKey('properties')">
+  				<trim suffixOverrides=","> 
+  					  				<if test="properties.contains('tenantId')">
+						tenant_id,
+					</if>
+					  				<if test="properties.contains('tenantName')">
+						tenant_name,
+					</if>
+					  				<if test="properties.contains('password')">
+						password,
+					</if>
+					  				<if test="properties.contains('passwordSalt')">
+						password_salt,
+					</if>
+					  				<if test="properties.contains('phone')">
+						phone,
+					</if>
+					  				<if test="properties.contains('email')">
+						email,
+					</if>
+					  				<if test="properties.contains('isEnable')">
+						is_enable,
+					</if>
+					  				<if test="properties.contains('lastLoginTime')">
+						last_login_time,
+					</if>
+					  				<if test="properties.contains('lastLoginIp')">
+						last_login_ip,
+					</if>
+					  				<if test="properties.contains('gmtCreate')">
+						gmt_create,
+					</if>
+					  				<if test="properties.contains('gmtModified')">
+						gmt_modified,
+					</if>
+				  				</trim>
+  			</when>
+  			<otherwise>
+  			<trim suffixOverrides=","> 
+		        				   tenant_id,
+								   tenant_name,
+								   password,
+								   password_salt,
+								   phone,
+								   email,
+								   is_enable,
+								   last_login_time,
+								   last_login_ip,
+								   gmt_create,
+								   gmt_modified,
+						  	</trim>
+  			</otherwise>
+  		</choose>
+  </sql>
+  
+  <sql id="whereSql">
+		<if test="entity.tenantId != null">
+			and tenant_id = #{entity.tenantId}
+		</if>
+		<if test="entity.tenantName != null">
+			and tenant_name = #{entity.tenantName}
+		</if>
+		<if test="entity.password != null">
+			and password = #{entity.password}
+		</if>
+		<if test="entity.passwordSalt != null">
+			and password_salt = #{entity.passwordSalt}
+		</if>
+		<if test="entity.phone != null">
+			and phone = #{entity.phone}
+		</if>
+		<if test="entity.email != null">
+			and email = #{entity.email}
+		</if>
+		<if test="entity.isEnable != null">
+			and is_enable = #{entity.isEnable}
+		</if>
+		<if test="entity.lastLoginTime != null">
+			and last_login_time = #{entity.lastLoginTime}
+		</if>
+		<if test="entity.lastLoginIp != null">
+			and last_login_ip = #{entity.lastLoginIp}
+		</if>
+		<if test="entity.gmtCreate != null">
+			and gmt_create = #{entity.gmtCreate}
+		</if>
+		<if test="entity.gmtModified != null">
+			and gmt_modified = #{entity.gmtModified}
+		</if>
+  </sql>
+  
+  	<select id="getById" resultMap="resultMap">
+		select <include refid="baseColumns"/>
+		from t_tenant_info
+		   where tenant_id = #{id}
+												</select>
+	
+	<select id="getByIds" resultMap="resultMap">
+	     select <include refid="baseColumns"/> from t_tenant_info
+		      where tenant_id in
+												     <foreach collection="ids" item="id" index="index"  open="(" close=")" separator=",">
+               #{id}
+         </foreach>  
+	</select>
+
+	<select id="get" resultMap="resultMap" parameterType="com.talelife.base.component.organization.dao.entity.TenantInfo">
+		select <include refid="baseColumns"/> from
+         t_tenant_info  where 1=1 <include refid="whereSql"/> limit 1
+	</select>
+	
+	<select id="findList"  parameterType="com.talelife.base.component.organization.dao.entity.TenantInfo" resultMap="resultMap">
+	     select <include refid="baseColumns"/> from t_tenant_info where 1=1 <include refid="whereSql"/>
+	</select>
+	
+	<select id="findAll" resultMap="resultMap">
+	     select <include refid="baseColumns"/> from t_tenant_info
+	</select>
+
+	<select id="getCount"  parameterType="com.talelife.base.component.organization.dao.entity.TenantInfo" resultType="java.lang.Integer">
+         select count(*) from t_tenant_info where 1=1 <include refid="whereSql"/>
+    </select>
+
+	<select id="getByAccountPassword" resultMap="resultMap">
+         select <include refid="baseColumns"/> from t_tenant_info where (phone = #{account} or email=#{account}) and password=#{password} limit 1
+    </select>
+    
+    <insert id="save" parameterType="com.talelife.base.component.organization.dao.entity.TenantInfo">
+       insert into t_tenant_info (
+		<trim suffixOverrides=","> 
+				<if test="entity.tenantId != null">
+				tenant_id,
+			</if>
+				<if test="entity.tenantName != null">
+				tenant_name,
+			</if>
+				<if test="entity.password != null">
+				password,
+			</if>
+				<if test="entity.passwordSalt != null">
+				password_salt,
+			</if>
+				<if test="entity.phone != null">
+				phone,
+			</if>
+				<if test="entity.email != null">
+				email,
+			</if>
+				<if test="entity.isEnable != null">
+				is_enable,
+			</if>
+				<if test="entity.lastLoginTime != null">
+				last_login_time,
+			</if>
+				<if test="entity.lastLoginIp != null">
+				last_login_ip,
+			</if>
+				<if test="entity.gmtCreate != null">
+				gmt_create,
+			</if>
+				<if test="entity.gmtModified != null">
+				gmt_modified,
+			</if>
+			</trim>
+		) values (
+		<trim suffixOverrides=",">
+				<if test="entity.tenantId != null">
+				#{entity.tenantId},
+			</if>
+				<if test="entity.tenantName != null">
+				#{entity.tenantName},
+			</if>
+				<if test="entity.password != null">
+				#{entity.password},
+			</if>
+				<if test="entity.passwordSalt != null">
+				#{entity.passwordSalt},
+			</if>
+				<if test="entity.phone != null">
+				#{entity.phone},
+			</if>
+				<if test="entity.email != null">
+				#{entity.email},
+			</if>
+				<if test="entity.isEnable != null">
+				#{entity.isEnable},
+			</if>
+				<if test="entity.lastLoginTime != null">
+				#{entity.lastLoginTime},
+			</if>
+				<if test="entity.lastLoginIp != null">
+				#{entity.lastLoginIp},
+			</if>
+				<if test="entity.gmtCreate != null">
+				#{entity.gmtCreate},
+			</if>
+				<if test="entity.gmtModified != null">
+				#{entity.gmtModified},
+			</if>
+			</trim>
+	)
+    </insert>
+    
+    <insert id="batchSave" parameterType="com.talelife.base.component.organization.dao.entity.TenantInfo">
+       insert into t_tenant_info (
+		<trim suffixOverrides=","> 
+					tenant_id,
+					tenant_name,
+					password,
+					password_salt,
+					phone,
+					email,
+					is_enable,
+					last_login_time,
+					last_login_ip,
+					gmt_create,
+					gmt_modified,
+				</trim>
+		) values 
+		<foreach collection="entities" item="entity" separator=",">
+		(
+		<trim suffixOverrides=",">
+					#{entity.tenantId},
+					#{entity.tenantName},
+					#{entity.password},
+					#{entity.passwordSalt},
+					#{entity.phone},
+					#{entity.email},
+					#{entity.isEnable},
+					#{entity.lastLoginTime},
+					#{entity.lastLoginIp},
+					#{entity.gmtCreate},
+					#{entity.gmtModified},
+				</trim>
+	   )
+	   </foreach>
+    </insert>
+    
+    <update id="updateById" parameterType="com.talelife.base.component.organization.dao.entity.TenantInfo">
+	    update t_tenant_info  set
+	     <trim suffixOverrides="," >
+									<if test="entity.tenantName != null">
+				tenant_name = #{entity.tenantName},
+			</if>
+								<if test="entity.password != null">
+				password = #{entity.password},
+			</if>
+								<if test="entity.passwordSalt != null">
+				password_salt = #{entity.passwordSalt},
+			</if>
+								<if test="entity.phone != null">
+				phone = #{entity.phone},
+			</if>
+								<if test="entity.email != null">
+				email = #{entity.email},
+			</if>
+								<if test="entity.isEnable != null">
+				is_enable = #{entity.isEnable},
+			</if>
+								<if test="entity.lastLoginTime != null">
+				last_login_time = #{entity.lastLoginTime},
+			</if>
+								<if test="entity.lastLoginIp != null">
+				last_login_ip = #{entity.lastLoginIp},
+			</if>
+								<if test="entity.gmtCreate != null">
+				gmt_create = #{entity.gmtCreate},
+			</if>
+								<if test="entity.gmtModified != null">
+				gmt_modified = #{entity.gmtModified},
+			</if>
+					  </trim>
+			 where tenant_id = #{entity.tenantId}
+												</update>
+
+	 <update id="updateByIds" parameterType="com.talelife.base.component.organization.dao.entity.TenantInfo">
+          update t_tenant_info  set
+	     <trim suffixOverrides="," >
+									<if test="entity.tenantName != null">
+				tenant_name = #{entity.tenantName},
+			</if>
+								<if test="entity.password != null">
+				password = #{entity.password},
+			</if>
+								<if test="entity.passwordSalt != null">
+				password_salt = #{entity.passwordSalt},
+			</if>
+								<if test="entity.phone != null">
+				phone = #{entity.phone},
+			</if>
+								<if test="entity.email != null">
+				email = #{entity.email},
+			</if>
+								<if test="entity.isEnable != null">
+				is_enable = #{entity.isEnable},
+			</if>
+								<if test="entity.lastLoginTime != null">
+				last_login_time = #{entity.lastLoginTime},
+			</if>
+								<if test="entity.lastLoginIp != null">
+				last_login_ip = #{entity.lastLoginIp},
+			</if>
+								<if test="entity.gmtCreate != null">
+				gmt_create = #{entity.gmtCreate},
+			</if>
+								<if test="entity.gmtModified != null">
+				gmt_modified = #{entity.gmtModified},
+			</if>
+					  </trim>
+			 where tenant_id in
+		  <foreach collection="ids" item="item" index="index"  open="(" close=")" separator=",">
+               #{item}
+         </foreach>
+												</update>
+	
+	<delete id="deleteById">
+        delete from t_tenant_info 
+	         where tenant_id = #{id}
+											    </delete>
+    
+     <delete id="deleteByIds">
+        delete from t_tenant_info 
+	         where tenant_id in 
+											        <foreach collection="ids" item="item" index="index"  open="(" close=")" separator=",">
+               #{item}
+        </foreach>  
+	</delete>
+    
+    <delete id="delete" parameterType="com.talelife.base.component.organization.dao.entity.TenantInfo">
+        delete from t_tenant_info where 1=1 <include refid="whereSql"/> 
+    </delete>
+    
+    <select id="getCountByUsername"  parameterType="com.talelife.base.component.organization.dao.entity.TenantInfo" resultType="java.lang.Integer">
+         select count(*) from t_tenant_info where email=#{email} or phone=#{phone}
+    </select>
+    
+</mapper>
