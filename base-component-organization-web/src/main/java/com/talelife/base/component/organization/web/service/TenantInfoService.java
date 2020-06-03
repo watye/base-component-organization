@@ -39,4 +39,19 @@ public interface TenantInfoService extends CrudService<TenantInfo>{
 	 * @param lastLoginIp
 	 */
 	void updateLastLoginInfo(Long tenantId, String lastLoginIp);
+	
+	/**
+	 * 查询登录信息
+	 * @param token
+	 * @return
+	 */
+	TenantLoginInfo getLoginInfo(String token);
+	
+	/**
+	 * 查询token
+	 * @param tenantId
+	 * @param email
+	 * @return
+	 */
+	String getToken(Long tenantId, String email);
 }

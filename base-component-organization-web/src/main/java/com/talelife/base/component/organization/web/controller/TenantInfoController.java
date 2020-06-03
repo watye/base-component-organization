@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.github.pagehelper.PageInfo;
 import com.talelife.base.component.organization.dao.entity.TenantInfo;
 import com.talelife.base.component.organization.web.dto.TenantInfoDto;
+import com.talelife.base.component.organization.web.dto.TenantLoginInfo;
 import com.talelife.base.component.organization.web.service.TenantInfoService;
 import com.talelife.base.component.organization.web.vo.TenantInfoQuery;
 import com.talelife.base.component.organization.web.vo.TenantInfoRegister;
@@ -53,9 +54,9 @@ public class TenantInfoController extends BaseController {
 	
 	@ApiOperation(value = "登录")
 	@PostMapping("/login")
-	public void login(@RequestBody @Validated TenantLoginVO tenantLoginVO, HttpServletRequest request) {
+	public TenantLoginInfo login(@RequestBody @Validated TenantLoginVO tenantLoginVO, HttpServletRequest request) {
 		tenantLoginVO.setLastLoginIp(request.getRemoteAddr());
-		tenantInfoService.login(tenantLoginVO);
+		return tenantInfoService.login(tenantLoginVO);
 	}
 	
 	@ApiOperation(value = "分页查询")

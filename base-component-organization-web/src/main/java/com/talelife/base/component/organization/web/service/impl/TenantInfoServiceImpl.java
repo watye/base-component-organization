@@ -3,31 +3,30 @@ package com.talelife.base.component.organization.web.service.impl;
 import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
-
-import javax.annotation.Resource;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.imadcn.framework.idworker.generator.IdGenerator;
 import com.talelife.base.component.organization.dao.TenantInfoMapper;
 import com.talelife.base.component.organization.dao.entity.TenantInfo;
+import com.talelife.base.component.organization.web.constant.Constants;
 import com.talelife.base.component.organization.web.dto.TenantLoginInfo;
 import com.talelife.base.component.organization.web.enums.ExceptionCode;
 import com.talelife.base.component.organization.web.service.OrganizationInfoService;
 import com.talelife.base.component.organization.web.service.TenantInfoService;
-import com.talelife.base.component.organization.web.util.ExceptionUtils;
 import com.talelife.base.component.organization.web.vo.TenantInfoRegister;
 import com.talelife.base.component.organization.web.vo.TenantLoginVO;
-import com.talelife.framework.constant.Constants;
 import com.talelife.framework.enums.YesNoEnum;
 import com.talelife.framework.mapper.CrudMapper;
 import com.talelife.framework.util.BeanUtils;
 import com.talelife.framework.util.CacheUtils;
 import com.talelife.framework.util.EntityUtils;
+import com.talelife.framework.util.ExceptionUtils;
 
 @Service
 public class TenantInfoServiceImpl implements TenantInfoService {
@@ -38,7 +37,7 @@ public class TenantInfoServiceImpl implements TenantInfoService {
 	@Autowired
 	private OrganizationInfoService orgInfoService;
 	@Autowired
-	private RedisTemplate<String,TenantLoginInfo> redisTemplate;
+	private RedisTemplate<String,Object> redisTemplate;
 
 	@Override
 	public CrudMapper<TenantInfo> getDao() {
@@ -49,7 +48,7 @@ public class TenantInfoServiceImpl implements TenantInfoService {
 	@Override
 	public Long register(TenantInfoRegister infoRegister) {
 		if(mapper.getCountByUsername(infoRegister.getPhone(), infoRegister.getEmail()) > 0){
-			ExceptionUtils.throwBizException(ExceptionCode.TENANT_EXIST);
+			ExceptionUtils.throwBizException(ExceptionCode.TENANT_EXIST.getCode(),ExceptionCode.TENANT_EXIST.getMessage());
 		}
 		TenantInfo tenantInfo = BeanUtils.map(infoRegister, TenantInfo.class);
 		tenantInfo.setTenantId(idGenerator.nextId());
@@ -71,7 +70,7 @@ public class TenantInfoServiceImpl implements TenantInfoService {
 		entity.setTenantId(tenantId);
 		entity.setIsEnable(YesNoEnum.YES.getValue());
 		if(mapper.updateById(entity) < 1){
-			ExceptionUtils.throwBizException(ExceptionCode.TENANT_START_FAIL);
+			ExceptionUtils.throwBizException(ExceptionCode.TENANT_START_FAIL.getCode(),ExceptionCode.TENANT_START_FAIL.getMessage());
 		}
 	}
 
@@ -82,7 +81,7 @@ public class TenantInfoServiceImpl implements TenantInfoService {
 		entity.setTenantId(tenantId);
 		entity.setIsEnable(YesNoEnum.NO.getValue());
 		if(mapper.updateById(entity) < 1){
-			ExceptionUtils.throwBizException(ExceptionCode.TENANT_STOP_FAIL);
+			ExceptionUtils.throwBizException(ExceptionCode.TENANT_STOP_FAIL.getCode(),ExceptionCode.TENANT_STOP_FAIL.getMessage());
 		}
 	}
 
@@ -90,7 +89,7 @@ public class TenantInfoServiceImpl implements TenantInfoService {
 	public TenantLoginInfo login(TenantLoginVO tenantLoginVO) {
 		TenantInfo tenantInfo = mapper.getByAccountPassword(tenantLoginVO.getAccount(), tenantLoginVO.getPassword());
 		if(Objects.isNull(tenantInfo)){
-			ExceptionUtils.throwParameterException(ExceptionCode.TENANT_ACCOUNT_PASSWORD_INCORRECT);
+			ExceptionUtils.throwParameterException(ExceptionCode.TENANT_ACCOUNT_PASSWORD_INCORRECT.getCode(), ExceptionCode.TENANT_ACCOUNT_PASSWORD_INCORRECT.getMessage());
 		}
 		updateLastLoginInfo(tenantInfo.getTenantId(),tenantLoginVO.getLastLoginIp());
 		
@@ -101,12 +100,6 @@ public class TenantInfoServiceImpl implements TenantInfoService {
 		return tenantLoginInfo;
 	}
 
-	private void saveLoginInfo(TenantLoginInfo tenantLoginInfo) {
-		redisTemplate.opsForValue().set(CacheUtils.getCacheKey(Constants.ComponentOrganization.PROJECT_NAME, Constants.ComponentOrganization.TENANT_TOKEN_NAME, tenantLoginInfo.getEmail()), tenantLoginInfo);
-		TenantLoginInfo a =	redisTemplate.opsForValue().get(CacheUtils.getCacheKey(Constants.ComponentOrganization.PROJECT_NAME, Constants.ComponentOrganization.TENANT_TOKEN_NAME, tenantLoginInfo.getEmail()));
-		System.out.println(a.getEmail());
-	}
-
 	@Override
 	public void updateLastLoginInfo(Long tenantId, String lastLoginIp) {
 		TenantInfo tenantInfo = new TenantInfo();
@@ -114,5 +107,28 @@ public class TenantInfoServiceImpl implements TenantInfoService {
 		tenantInfo.setLastLoginIp(lastLoginIp);
 		tenantInfo.setLastLoginTime(new Date());
 		EntityUtils.setModifyProperty(tenantInfo);
+	}
+	
+	
+	@Override
+	public TenantLoginInfo getLoginInfo(String token) {
+		Objects.requireNonNull(token);
+		return (TenantLoginInfo) redisTemplate.opsForValue().get(CacheUtils.getCacheKey(Constants.PROJECT_NAME, Constants.TENANT_INFO, token));
+	}
+	
+	@Override
+	public String getToken(Long tenantId, String email) {
+		Objects.requireNonNull(tenantId);
+		Objects.requireNonNull(email);
+		return redisTemplate.opsForValue().get(CacheUtils.getCacheKey(Constants.PROJECT_NAME, Constants.TENANT_TOKEN, tenantId+"-"+email)).toString();
+	}
+	
+	private void saveLoginInfo(TenantLoginInfo tenantLoginInfo) {
+		
+		ValueOperations<String, Object> ops = redisTemplate.opsForValue();
+		ops.set(CacheUtils.getCacheKey(Constants.PROJECT_NAME, Constants.TENANT_INFO,tenantLoginInfo.getToken()), tenantLoginInfo, Constants.TOKEN_EXPIRE_TIME,TimeUnit.MINUTES);
+		
+		ops.set(CacheUtils.getCacheKey(Constants.PROJECT_NAME, Constants.TENANT_TOKEN,tenantLoginInfo.getTenantId()+"-"+tenantLoginInfo.getEmail()), 
+				tenantLoginInfo.getToken(), Constants.TOKEN_EXPIRE_TIME,TimeUnit.MINUTES);
 	}
 }
