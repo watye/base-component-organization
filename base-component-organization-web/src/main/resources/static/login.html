@@ -89,11 +89,12 @@ label.el-checkbox.rememberme {
                       axios.post('/web/tenantInfo/login', {
                    		  account:This.loginForm.username,password:This.loginForm.password
                    	  }).then(function (response) {
-                   		  var data = response.data;
-                   		  if(data.code==0){
+                   		  var result = response.data;
+                   		  if(result.code==0){
                            	  This.logining = false;
+                           	  sessionStorage.setItem("X-tenant-Token",result.data.token);
                           }else{
-	                       	  This.$message.error(data.message);
+	                       	  This.$message.error(result.message);
 	                       	  This.logining = false;
                           }
                    	  }).catch(function (error) {

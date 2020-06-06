@@ -15,12 +15,10 @@ import com.talelife.base.component.organization.web.vo.TenantInfoQuery;
 import com.talelife.base.component.organization.web.vo.TenantInfoRegister;
 import com.talelife.base.component.organization.web.vo.TenantLoginVO;
 import com.talelife.framework.entity.PageQueryParameter;
-import com.talelife.framework.entity.Result;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TenantInfoControllerTest extends AbstractControllerTest{
 	private static String randomNum = String.valueOf(System.currentTimeMillis()).substring(10);
-	private static Long tenantId;
 	private static String token;
 	private static TenantInfoRegister infoRegister;
 	@Test
@@ -30,10 +28,8 @@ public class TenantInfoControllerTest extends AbstractControllerTest{
 		infoRegister.setPassword("123");
 		infoRegister.setPhone("18823660"+randomNum);
 		infoRegister.setTenantName("dev1"+randomNum);
-		String response = mvc.perform(post("/web/tenantInfo/register", JSON.toJSONString(infoRegister))).andExpect(MockMvcResultMatchers.status().isOk())
+		mvc.perform(post("/web/tenantInfo/register", JSON.toJSONString(infoRegister))).andExpect(MockMvcResultMatchers.status().isOk())
 		.andDo(MockMvcResultHandlers.print()).andReturn().getResponse().getContentAsString();
-		Result result = JSON.parseObject(response, Result.class);
-		tenantId = Long.valueOf(result.getData().toString());
 	}
 	
 	@Test
@@ -49,13 +45,13 @@ public class TenantInfoControllerTest extends AbstractControllerTest{
 	
 	@Test
 	public void test1003Stop() throws Exception{
-		mvc.perform(put("/web/tenantInfo/stop/"+tenantId,null,getTokenParam())).andExpect(MockMvcResultMatchers.status().isOk())
+		mvc.perform(put("/web/tenantInfo/stop",null,getTokenParam())).andExpect(MockMvcResultMatchers.status().isOk())
 		.andDo(MockMvcResultHandlers.print());
 	}
 	
 	@Test
 	public void test1004Start() throws Exception{
-		mvc.perform(put("/web/tenantInfo/start/"+tenantId,null,getTokenParam())).andExpect(MockMvcResultMatchers.status().isOk())
+		mvc.perform(put("/web/tenantInfo/start",null,getTokenParam())).andExpect(MockMvcResultMatchers.status().isOk())
 		.andDo(MockMvcResultHandlers.print());
 	}
 
@@ -63,7 +59,7 @@ public class TenantInfoControllerTest extends AbstractControllerTest{
 	public void test1005Page() throws Exception{
 		PageQueryParameter<TenantInfoQuery> pageQuery = new PageQueryParameter<>();
 		pageQuery.setQuery(new TenantInfoQuery());
-		mvc.perform(post("/web/tenantInfo/page/",JSON.toJSONString(pageQuery),getTokenParam())).andExpect(MockMvcResultMatchers.status().isOk())
+		mvc.perform(post("/web/tenantInfo/page",JSON.toJSONString(pageQuery),getTokenParam())).andExpect(MockMvcResultMatchers.status().isOk())
 		.andDo(MockMvcResultHandlers.print());
 	}
 
@@ -74,20 +70,17 @@ public class TenantInfoControllerTest extends AbstractControllerTest{
 	}
 	
 	/******************** 临时测试 *********************************/
-	@Test
+	//@Test
 	public void testLogin() throws Exception{
-		//{"account":"dev652@qq.com","password":"123"}
 		TenantLoginVO tenant = new TenantLoginVO();
 		tenant.setAccount("dev219@qq.com");
-		//tenant.setAccount("dev1749@qq.com");
 		tenant.setPassword("123");
 		String response = mvc.perform(post("/web/tenantInfo/login", JSON.toJSONString(tenant))).andExpect(MockMvcResultMatchers.status().isOk())
 		.andDo(MockMvcResultHandlers.print()).andReturn().getResponse().getContentAsString();
-		//5c459f66-2cdc-443b-8dcf-151d2b7c3c2d
 		
 	}
 	
-	@Test
+	//@Test
 	public void testStop() throws Exception{
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(Constants.HEADER_TOKEN, "aaa0a424-a1fe-4f64-bf0e-6eb8bd458d97");

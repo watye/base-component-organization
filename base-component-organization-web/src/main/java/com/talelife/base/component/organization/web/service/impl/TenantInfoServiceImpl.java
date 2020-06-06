@@ -1,16 +1,20 @@
 package com.talelife.base.component.organization.web.service.impl;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.assertj.core.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.collect.Lists;
 import com.imadcn.framework.idworker.generator.IdGenerator;
 import com.talelife.base.component.organization.dao.TenantInfoMapper;
 import com.talelife.base.component.organization.dao.entity.TenantInfo;
@@ -19,6 +23,7 @@ import com.talelife.base.component.organization.web.dto.TenantLoginInfo;
 import com.talelife.base.component.organization.web.enums.ExceptionCode;
 import com.talelife.base.component.organization.web.service.OrganizationInfoService;
 import com.talelife.base.component.organization.web.service.TenantInfoService;
+import com.talelife.base.component.organization.web.util.UserContext;
 import com.talelife.base.component.organization.web.vo.TenantInfoRegister;
 import com.talelife.base.component.organization.web.vo.TenantLoginVO;
 import com.talelife.framework.enums.YesNoEnum;
@@ -124,7 +129,7 @@ public class TenantInfoServiceImpl implements TenantInfoService {
 	}
 	
 	private void saveLoginInfo(TenantLoginInfo tenantLoginInfo) {
-		
+		UserContext.setLoginInfo(tenantLoginInfo);
 		ValueOperations<String, Object> ops = redisTemplate.opsForValue();
 		ops.set(CacheUtils.getCacheKey(Constants.PROJECT_NAME, Constants.TENANT_INFO,tenantLoginInfo.getToken()), tenantLoginInfo, Constants.TOKEN_EXPIRE_TIME,TimeUnit.MINUTES);
 		

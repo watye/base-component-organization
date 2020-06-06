@@ -19,6 +19,7 @@ import com.talelife.base.component.organization.dao.entity.TenantInfo;
 import com.talelife.base.component.organization.web.dto.TenantInfoDto;
 import com.talelife.base.component.organization.web.dto.TenantLoginInfo;
 import com.talelife.base.component.organization.web.service.TenantInfoService;
+import com.talelife.base.component.organization.web.util.UserContext;
 import com.talelife.base.component.organization.web.vo.TenantInfoQuery;
 import com.talelife.base.component.organization.web.vo.TenantInfoRegister;
 import com.talelife.base.component.organization.web.vo.TenantInfoUpdate;
@@ -82,14 +83,14 @@ public class TenantInfoController extends BaseController {
 	}
 	
 	@ApiOperation(value = "启用")
-	@PutMapping(value="/start/{id}")
-	public void start(@PathVariable Long id) {
-		tenantInfoService.start(id);
+	@PutMapping(value="/start")
+	public void start() {
+		tenantInfoService.start(UserContext.getLoginInfo().getTenantId());
 	}
 	
 	@ApiOperation(value = "停用")
-	@PutMapping(value="/stop/{id}")
-	public void stop(@PathVariable Long id) {
-		tenantInfoService.stop(id);
+	@PutMapping(value="/stop")
+	public void stop() {
+		tenantInfoService.stop(UserContext.getLoginInfo().getTenantId());
 	}
 }
