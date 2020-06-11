@@ -26,12 +26,6 @@ public class OrgInfoAdd implements Serializable {
 	@ApiModelProperty(value = "部门名称")
 	private String orgName;
 	/**
-	 * 排序号
-	 */
-	@NotNull(message = "排序号不能为空")
-	@ApiModelProperty(value = "排序号")
-	private Integer sort;
-	/**
 	 * 父组织id
 	 */
 	@NotNull(message = "父组织id不能为空")
@@ -42,12 +36,6 @@ public class OrgInfoAdd implements Serializable {
 	}
 	public void setOrgName(String orgName) {
 		this.orgName = orgName;
-	}
-	public Integer getSort() {
-		return sort;
-	}
-	public void setSort(Integer sort) {
-		this.sort = sort;
 	}
 	public Long getParentOrgId() {
 		return parentOrgId;

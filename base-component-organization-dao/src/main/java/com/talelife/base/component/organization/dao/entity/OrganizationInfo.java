@@ -59,6 +59,19 @@ public class OrganizationInfo extends BaseEntity {
 	 */
 	private Date gmtModified;
 
+	/**
+	 * 关键字
+	 */
+	private String keyword;
+	
+	public String getKeyword() {
+		return keyword;
+	}
+
+	public void setKeyword(String keyword) {
+		this.keyword = keyword;
+	}
+
 	public void setTenantId(Long tenantId) {
 		this.tenantId = tenantId;
 	}

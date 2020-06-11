@@ -1,20 +1,16 @@
 package com.talelife.base.component.organization.web.service.impl;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import org.assertj.core.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Lists;
 import com.imadcn.framework.idworker.generator.IdGenerator;
 import com.talelife.base.component.organization.dao.TenantInfoMapper;
 import com.talelife.base.component.organization.dao.entity.TenantInfo;
@@ -23,7 +19,6 @@ import com.talelife.base.component.organization.web.dto.TenantLoginInfo;
 import com.talelife.base.component.organization.web.enums.ExceptionCode;
 import com.talelife.base.component.organization.web.service.OrganizationInfoService;
 import com.talelife.base.component.organization.web.service.TenantInfoService;
-import com.talelife.base.component.organization.web.util.UserContext;
 import com.talelife.base.component.organization.web.vo.TenantInfoRegister;
 import com.talelife.base.component.organization.web.vo.TenantLoginVO;
 import com.talelife.framework.enums.YesNoEnum;
@@ -32,7 +27,11 @@ import com.talelife.framework.util.BeanUtils;
 import com.talelife.framework.util.CacheUtils;
 import com.talelife.framework.util.EntityUtils;
 import com.talelife.framework.util.ExceptionUtils;
-
+/**
+ * 
+ * @author lwy
+ *
+ */
 @Service
 public class TenantInfoServiceImpl implements TenantInfoService {
 	@Autowired
@@ -49,7 +48,7 @@ public class TenantInfoServiceImpl implements TenantInfoService {
 		return this.mapper;
 	}
 
-	@Transactional
+	@Transactional(rollbackFor=Exception.class)
 	@Override
 	public Long register(TenantInfoRegister infoRegister) {
 		if(mapper.getCountByUsername(infoRegister.getPhone(), infoRegister.getEmail()) > 0){
@@ -122,16 +121,20 @@ public class TenantInfoServiceImpl implements TenantInfoService {
 	}
 	
 	@Override
-	public String getToken(Long tenantId, String email) {
+	public String getAndUpdateToken(Long tenantId, String email) {
 		Objects.requireNonNull(tenantId);
 		Objects.requireNonNull(email);
-		return redisTemplate.opsForValue().get(CacheUtils.getCacheKey(Constants.PROJECT_NAME, Constants.TENANT_TOKEN, tenantId+"-"+email)).toString();
+		String key = CacheUtils.getCacheKey(Constants.PROJECT_NAME, Constants.TENANT_TOKEN, tenantId+"-"+email);
+		String token = redisTemplate.opsForValue().get(key).toString();
+		if(Objects.nonNull(token)){
+			redisTemplate.expire(key, Constants.TOKEN_EXPIRE_TIME, TimeUnit.MINUTES);
+		}
+		return token;
 	}
 	
 	private void saveLoginInfo(TenantLoginInfo tenantLoginInfo) {
-		UserContext.setLoginInfo(tenantLoginInfo);
 		ValueOperations<String, Object> ops = redisTemplate.opsForValue();
-		ops.set(CacheUtils.getCacheKey(Constants.PROJECT_NAME, Constants.TENANT_INFO,tenantLoginInfo.getToken()), tenantLoginInfo, Constants.TOKEN_EXPIRE_TIME,TimeUnit.MINUTES);
+		ops.set(CacheUtils.getCacheKey(Constants.PROJECT_NAME, Constants.TENANT_INFO,tenantLoginInfo.getToken()), tenantLoginInfo, Constants.LOGIN_INFO_EXPIRE_TIME,TimeUnit.HOURS);
 		
 		ops.set(CacheUtils.getCacheKey(Constants.PROJECT_NAME, Constants.TENANT_TOKEN,tenantLoginInfo.getTenantId()+"-"+tenantLoginInfo.getEmail()), 
 				tenantLoginInfo.getToken(), Constants.TOKEN_EXPIRE_TIME,TimeUnit.MINUTES);

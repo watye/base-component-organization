@@ -9,7 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.talelife.base.component.organization.dao.entity.MemberInfo;
 import com.talelife.base.component.organization.web.AbstractTest;
-
+/**
+ * 
+ * @author lwy
+ *
+ */
 public class MemberInfoServiceTest extends AbstractTest{
 	@Autowired
 	private MemberInfoService memberInfoService;

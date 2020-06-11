@@ -16,6 +16,10 @@ public final class Constants {
 	 */
 	public static final int TOKEN_EXPIRE_TIME = 10;
 	/**
+	 * 登录信息过期时间(24小时)
+	 */
+	public static final int LOGIN_INFO_EXPIRE_TIME = 24;
+	/**
 	 * 登录租房
 	 */
 	public static final String TENANT_INFO = "tenant_info";

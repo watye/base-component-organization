@@ -109,6 +109,10 @@
 		<if test="entity.gmtModified != null">
 			and gmt_modified = #{entity.gmtModified}
 		</if>
+		<if test="entity.keyword != null">
+			<bind name="keyword" value="keyword+'%'"/>
+			and org_name like #{keyword}
+		</if>
 	</sql>
 
 	<select id="getById" resultMap="resultMap">
@@ -373,4 +377,10 @@
 		delete from t_organization_info where 1=1
 		<include refid="whereSql" />
 	</delete>
+	
+	<update id="updatePathByParent">
+		<bind name="idPath" value="parentIdPath+'%'"/>
+		update t_organization_info set id_path=concat(#{parentIdPath},id_path,',') where id_path like #{idPath} 
+		and id_path &lt;&gt; #{parentIdPath}
+	</update>
 </mapper>

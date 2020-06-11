@@ -60,7 +60,7 @@ label.el-checkbox.rememberme {
   </div>
 </body>
   <script src="/static/js/vue/dist/vue.js"></script>
-  <script src="/static/js/vue/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="/static/element-ui/lib/index.js"></script>
   <script>
     new Vue({
@@ -69,8 +69,8 @@ label.el-checkbox.rememberme {
     	  return {
               logining: false,
               loginForm: {
-                  username: 'dev219@qq.com',
-                  password: '123',
+                  username: 'admin',
+                  password: '123456',
               },
               rules: {
                   username: [{required: true, message: '请输入账号', trigger: 'blur'}],
@@ -93,7 +93,6 @@ label.el-checkbox.rememberme {
                    		  if(result.code==0){
                            	  This.logining = false;
                            	  sessionStorage.setItem("X-tenant-Token",result.data.token);
-                           	  location.href="/static/index.html"
                           }else{
 	                       	  This.$message.error(result.message);
 	                       	  This.logining = false;

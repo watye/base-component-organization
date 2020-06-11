@@ -1,7 +1,11 @@
 package com.talelife.base.component.organization.web.vo;
 
 import javax.validation.constraints.NotBlank;
-
+/**
+ * 
+ * @author lwy
+ *
+ */
 public class TenantLoginVO {
 	/**
 	 * 账号（手机/邮箱）
@@ -34,5 +38,9 @@ public class TenantLoginVO {
 	}
 	public void setLastLoginIp(String lastLoginIp) {
 		this.lastLoginIp = lastLoginIp;
+	}
+	@Override
+	public String toString() {
+		return "TenantLoginVO [account=" + account + ", password=" + password + ", lastLoginIp=" + lastLoginIp + "]";
 	}
 }

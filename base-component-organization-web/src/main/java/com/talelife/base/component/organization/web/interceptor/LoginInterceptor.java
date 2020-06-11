@@ -14,9 +14,14 @@ import com.talelife.base.component.organization.web.constant.Constants;
 import com.talelife.base.component.organization.web.dto.TenantLoginInfo;
 import com.talelife.base.component.organization.web.enums.ExceptionCode;
 import com.talelife.base.component.organization.web.service.TenantInfoService;
+import com.talelife.base.component.organization.web.util.UserContext;
 import com.talelife.framework.exception.LoginException;
 
-
+/**
+ * 
+ * @author lwy
+ *
+ */
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
 	@Autowired
@@ -34,8 +39,9 @@ public class LoginInterceptor implements HandlerInterceptor {
 		 if(Objects.isNull(tenantInfo)){
 			 throwLoginException(ExceptionCode.TENANT_UNLOGIN);
 		 }
+		 UserContext.setLoginInfo(tenantInfo);
 		 
-		 String loginToken = tenantInfoService.getToken(tenantInfo.getTenantId(), tenantInfo.getEmail());
+		 String loginToken = tenantInfoService.getAndUpdateToken(tenantInfo.getTenantId(), tenantInfo.getEmail());
 		 if(!StringUtils.hasText(loginToken)){
 			 throwLoginException(ExceptionCode.TENANT_UNLOGIN);
 		 }

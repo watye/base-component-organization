@@ -7,7 +7,11 @@ import com.talelife.base.component.organization.dao.MemberInfoMapper;
 import com.talelife.base.component.organization.dao.entity.MemberInfo;
 import com.talelife.base.component.organization.web.service.MemberInfoService;
 import com.talelife.framework.mapper.CrudMapper;
-
+/**
+ * 
+ * @author lwy
+ *
+ */
 @Service
 public class MemberInfoServiceImpl implements MemberInfoService {
 	@Autowired

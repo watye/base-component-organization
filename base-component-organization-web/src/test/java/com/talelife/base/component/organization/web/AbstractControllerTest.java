@@ -16,6 +16,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.WebApplicationContext;
+
+import com.talelife.base.component.organization.web.constant.Constants;
 /**
  * 控制器测试用例基类
  * date: 2020-05-27 15:34:20
@@ -29,6 +31,12 @@ public abstract class AbstractControllerTest{
 	protected MockMvc mvc;
 	@Autowired
 	private WebApplicationContext wac;
+	
+	protected static HttpHeaders getTokenParam(String token) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(Constants.HEADER_TOKEN, token);
+		return headers;
+	}
 	
 	@Before
 	public void setupMockMvc(){

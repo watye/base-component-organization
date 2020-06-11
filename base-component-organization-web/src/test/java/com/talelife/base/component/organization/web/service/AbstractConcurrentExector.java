@@ -14,7 +14,7 @@ import com.talelife.base.component.organization.web.AbstractTest;
  * @author lwy
  *
  */
-public abstract class ConcurrentExector extends AbstractTest{
+public abstract class AbstractConcurrentExector extends AbstractTest{
 	private int threads = 100;
 	private static CountDownLatch latch;
 	

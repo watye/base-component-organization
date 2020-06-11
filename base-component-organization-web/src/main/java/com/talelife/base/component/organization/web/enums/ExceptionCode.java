@@ -5,14 +5,41 @@ package com.talelife.base.component.organization.web.enums;
  * @author lwy
  */
 public enum ExceptionCode {
-	LOGIN_ELSEWHERE(1000,"在其它地方登录"),
+	/**
+	 * 账号在其它地方登录
+	 */
+	LOGIN_ELSEWHERE(1000,"账号在其它地方登录"),
+	/**
+	 * 数据不允许删除
+	 */
 	DATA_CANNOT_DELETE(2001,"数据不允许删除"),
+	/**
+	 * 编码不正确
+	 */
 	CODE_INVALID(-1000,"编码不正确"),
+	/**
+	 * 租户已存在
+	 */
 	TENANT_EXIST(1001,"租户已存在"),
+	/**
+	 * 租户启用失败
+	 */
 	TENANT_START_FAIL(1002,"租户启用失败"),
+	/**
+	 * 租户停用失败
+	 */
 	TENANT_STOP_FAIL(1003,"租户停用失败"),
+	/**
+	 * 租户账号密码不正确
+	 */
 	TENANT_ACCOUNT_PASSWORD_INCORRECT(1004,"租户账号密码不正确"),
+	/**
+	 * 认证失败
+	 */
 	TENANT_UNLOGIN(1005,"认证失败"),
+	/**
+	 * 组织不存在
+	 */
 	ORG_NOT_FOUNT(1006,"组织不存在");
 	
 	private Integer code;

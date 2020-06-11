@@ -6,7 +6,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
+/**
+ * 
+ * @author lwy
+ *
+ */
 @SpringBootApplication
 @MapperScan("com.talelife.base.component.organization.dao")
 @EnableSwagger2

@@ -12,7 +12,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 import com.talelife.base.component.organization.web.interceptor.LoginInterceptor;
 import com.talelife.framework.interceptor.ResponseResultInterceptor;
 
-
+/**
+ * 
+ * @author lwy
+ *
+ */
 @Configuration
 public class MvcInterceptorConfig extends WebMvcConfigurationSupport {
 	private static final String STATIC_RESOURCE_PATH = "/static/**";
@@ -29,7 +33,7 @@ public class MvcInterceptorConfig extends WebMvcConfigurationSupport {
 	@Override
 	protected void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(responseResultInterceptor).addPathPatterns("/**").excludePathPatterns(STATIC_RESOURCE_PATH);
-		registry.addInterceptor(loginInterceptor).addPathPatterns("/**").excludePathPatterns(nonLoginPath);
+		registry.addInterceptor(loginInterceptor).addPathPatterns("/web/**").excludePathPatterns(nonLoginPath);
 		super.addInterceptors(registry);
 	}
 	

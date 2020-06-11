@@ -1,19 +1,39 @@
 package com.talelife.base.component.organization.web.service.impl;
 
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.imadcn.framework.idworker.generator.IdGenerator;
 import com.talelife.base.component.organization.dao.OrganizationInfoMapper;
 import com.talelife.base.component.organization.dao.entity.OrganizationInfo;
 import com.talelife.base.component.organization.dao.entity.TenantInfo;
+import com.talelife.base.component.organization.web.enums.ExceptionCode;
 import com.talelife.base.component.organization.web.service.OrganizationInfoService;
+import com.talelife.base.component.organization.web.vo.OrgInfoUpdate;
 import com.talelife.framework.enums.YesNoEnum;
 import com.talelife.framework.mapper.CrudMapper;
 import com.talelife.framework.util.EntityUtils;
-
+import com.talelife.framework.util.ExceptionUtils;
+/**
+ * 
+ * @author lwy
+ *
+ */
 @Service
 public class OrganizationInfoServiceImpl implements OrganizationInfoService {
+	/**
+	 * 顶级idPath格式
+	 */
+	private static final String TOP_ID_PATH_FORMAT = "%s,";
+	/**
+	 * 子级idPath格式
+	 */
+	private static final String MIDDLE_ID_PATH_FORMAT = "%s%s,";
 	@Autowired
 	private OrganizationInfoMapper mapper;
 	@Autowired
@@ -25,12 +45,17 @@ public class OrganizationInfoServiceImpl implements OrganizationInfoService {
 	
 	@Override
 	public boolean save(OrganizationInfo entity) {
-		
-		entity.setOrgId(idGenerator.nextId());
+		Long parentOrgId = entity.getParentOrgId();
+		if(parentOrgId > 0){
+			OrganizationInfo parentOrgInfo = getById(parentOrgId);
+			entity.setIdPath(String.format(MIDDLE_ID_PATH_FORMAT, parentOrgInfo.getIdPath(),entity.getOrgId()));
+			entity.setNamePath(String.format(MIDDLE_ID_PATH_FORMAT, parentOrgInfo.getNamePath(),entity.getOrgName()));
+		}else{
+			entity.setIdPath(String.format(TOP_ID_PATH_FORMAT, entity.getOrgId()));
+			entity.setNamePath(String.format(TOP_ID_PATH_FORMAT, entity.getOrgName()));
+		}
 		entity.setIsDeleted(YesNoEnum.NO.getValue());
 		entity.setMemberCount(0);
-		entity.setIdPath(String.format("%s,", entity.getOrgId()));
-		entity.setNamePath(entity.getOrgName());
 		EntityUtils.setCreateProperty(entity);
 		return OrganizationInfoService.super.save(entity);
 	}
@@ -44,11 +69,60 @@ public class OrganizationInfoServiceImpl implements OrganizationInfoService {
 		orgInfo.setOrgName(tenantInfo.getTenantName());
 		orgInfo.setIsDeleted(YesNoEnum.NO.getValue());
 		orgInfo.setMemberCount(0);
-		orgInfo.setIdPath(String.format("%s,", orgInfo.getOrgId()));
-		orgInfo.setNamePath(orgInfo.getOrgName());
+		orgInfo.setIdPath(String.format(TOP_ID_PATH_FORMAT, orgInfo.getOrgId()));
+		orgInfo.setNamePath(String.format(TOP_ID_PATH_FORMAT,orgInfo.getOrgName()));
 		orgInfo.setSort(0);
 		orgInfo.setParentOrgId(0L);
 		EntityUtils.setCreateProperty(orgInfo);
 		save(orgInfo);
 	}
+
+	@Override
+	@Transactional(rollbackFor=Exception.class)
+	public void updateOrgInfo(OrgInfoUpdate orgInfoUpdate) {
+		Long orgId = orgInfoUpdate.getOrgId();
+		Objects.requireNonNull(orgId);
+		
+		OrganizationInfo sourceOrgInfo = getById(orgId);
+		if(Objects.isNull(sourceOrgInfo)){
+			ExceptionUtils.throwParameterException(ExceptionCode.ORG_NOT_FOUNT.getCode(), ExceptionCode.ORG_NOT_FOUNT.getMessage());
+		}
+		
+		updateCurrentOrgInfo(orgInfoUpdate, sourceOrgInfo);
+		
+		//更新下级的路径信息
+		mapper.updatePathByParent(sourceOrgInfo.getIdPath());
+	}
+
+	/**
+	 * 更新本组织信息
+	 * @param orgInfoUpdate 更新内容
+	 * @param sourceOrgInfo 原组织信息
+	 */
+	private void updateCurrentOrgInfo(OrgInfoUpdate orgInfoUpdate, OrganizationInfo sourceOrgInfo) {
+		OrganizationInfo entity = new OrganizationInfo();
+		entity.setOrgId(orgInfoUpdate.getOrgId());
+		entity.setOrgName(orgInfoUpdate.getOrgName());
+		
+		Long parentOrgId = orgInfoUpdate.getParentOrgId();
+		//迁移组织
+		if(Objects.nonNull(parentOrgId)){
+			OrganizationInfo parentOrgInfo = getById(parentOrgId);
+			if(Objects.isNull(parentOrgInfo)){
+				ExceptionUtils.throwParameterException(ExceptionCode.ORG_NOT_FOUNT.getCode(), ExceptionCode.ORG_NOT_FOUNT.getMessage());
+			}
+			entity.setParentOrgId(parentOrgId);
+			entity.setIdPath(String.format(MIDDLE_ID_PATH_FORMAT, parentOrgInfo.getIdPath(), entity.getOrgId()));
+			entity.setNamePath(String.format(MIDDLE_ID_PATH_FORMAT, parentOrgInfo.getNamePath(), entity.getOrgName()));
+		}else{
+			//不迁移组织
+			String[] pathArray = sourceOrgInfo.getNamePath().split(",");
+			pathArray[pathArray.length-1] = entity.getOrgName();
+			entity.setNamePath(Arrays.asList(pathArray).stream().collect(Collectors.joining(",","",",")));
+		}
+		
+		EntityUtils.setModifyProperty(entity);
+		updateById(entity);
+	}
+	
 }

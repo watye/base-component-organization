@@ -5,12 +5,17 @@ import com.talelife.base.component.organization.web.dto.TenantLoginInfo;
 import com.talelife.base.component.organization.web.vo.TenantInfoRegister;
 import com.talelife.base.component.organization.web.vo.TenantLoginVO;
 import com.talelife.framework.service.CrudService;
-
+/**
+ * 
+ * @author lwy
+ *
+ */
 public interface TenantInfoService extends CrudService<TenantInfo>{
 
 	/**
 	 * 注册租户
 	 * @param infoRegister
+	 * @return 租户id
 	 */
 	Long register(TenantInfoRegister infoRegister);
 
@@ -29,7 +34,7 @@ public interface TenantInfoService extends CrudService<TenantInfo>{
 	/**
 	 * 租户登录
 	 * @param tenantLoginVO
-	 * @return 
+	 * @return 登录信息
 	 */
 	TenantLoginInfo login(TenantLoginVO tenantLoginVO);
 	
@@ -43,7 +48,7 @@ public interface TenantInfoService extends CrudService<TenantInfo>{
 	/**
 	 * 查询登录信息
 	 * @param token
-	 * @return
+	 * @return 登录信息
 	 */
 	TenantLoginInfo getLoginInfo(String token);
 	
@@ -51,7 +56,7 @@ public interface TenantInfoService extends CrudService<TenantInfo>{
 	 * 查询token
 	 * @param tenantId
 	 * @param email
-	 * @return
+	 * @return 登录的token
 	 */
-	String getToken(Long tenantId, String email);
+	String getAndUpdateToken(Long tenantId, String email);
 }

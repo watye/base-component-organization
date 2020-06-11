@@ -16,6 +16,7 @@ public class UserContext {
 	}
 	
 	public static void setLoginInfo(TenantLoginInfo tenantLoginInfo){
+		threadLocal.remove();
 		threadLocal.set(tenantLoginInfo);
 	}
 }

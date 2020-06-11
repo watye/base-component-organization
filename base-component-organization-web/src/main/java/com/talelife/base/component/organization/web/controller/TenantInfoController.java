@@ -93,4 +93,10 @@ public class TenantInfoController extends BaseController {
 	public void stop() {
 		tenantInfoService.stop(UserContext.getLoginInfo().getTenantId());
 	}
+	
+	@ApiOperation(value = "登录信息")
+	@GetMapping(value="/getLoginInfo")
+	public TenantLoginInfo getLoginInfo() {
+		return UserContext.getLoginInfo();
+	}
 }

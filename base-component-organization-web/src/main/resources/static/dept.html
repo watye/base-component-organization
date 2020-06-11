@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="/static/element-ui/lib/theme-chalk/index.css">
+
+  <style scoped>
+#app{
+    width: 100%;
+    height: 100%;
+}
+html,body{
+	margin:0;
+	width: 100%;
+    height: 100%;
+}
+</style>
+</head>
+<body>
+  <div id="app">
+    <el-container style="width:100%;height:100%;padding:20px">
+    	<el-header style="padding-bottom:0">
+	    	<el-row>
+			  <el-button size="mini" @click="addForm()">新增</el-button>
+			  <el-button size="mini">默认按钮</el-button>
+			  <el-button size="mini">默认按钮</el-button>
+			</el-row>
+		</el-header>
+		<el-main>
+		 	<el-tree
+			  :props="props"
+			  :load="loadNode"
+			  ref="orgTree"
+			  lazy
+			  show-checkbox>
+			</el-tree>
+		</el-main>
+	</el-container>
+	<div>
+			<el-dialog title="新增部门" :visible.sync="dialogVisibleAdd" width="550px">
+				<el-form :model="formData">
+					<el-form-item label="所属上级" :label-width="'100px'">
+						<el-input v-model="formData.parentOrgName" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="部门名称" :label-width="'100px'">
+						<el-input v-model="formData.orgName" auto-complete="off"></el-input>
+					</el-form-item>
+				</el-form>
+				<span slot="footer" class="dialog-footer">
+					<el-button size="mini" @click="dialogVisibleAdd = false">取 消</el-button>
+					<el-button size="mini" type="primary" @click="addAction()">保 存</el-button>
+				</span>
+			</el-dialog>
+			<el-dialog title="编辑部门" :visible.sync="dialogVisibleEdit" width="550px">
+				<el-form :model="formData">
+					<el-form-item label="所属上级" :label-width="'100px'">
+						<el-input v-model="formData.parentOrgName" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="部门名称" :label-width="'100px'">
+						<el-input v-model="formData.orgName" auto-complete="off"></el-input>
+					</el-form-item>
+				</el-form>
+				<span slot="footer" class="dialog-footer">
+					<el-button size="mini" @click="dialogVisibleEdit = false">取 消</el-button>
+					<el-button size="mini" type="primary" @click="editAction()">保 存</el-button>
+				</span>
+			</el-dialog>
+		</div>
+  </div>
+</body>
+<script src="/static/js/vue/dist/vue.js"></script>
+<script src="/static/element-ui/lib/index.js"></script>
+<script src="/static/js/vue/dist/axios.min.js"></script>
+ 
+  <script type="text/javascript">
+  
+    new Vue({
+      el: '#app',
+      data: function() {
+    	  return {
+    		  props: {
+    	          label: 'orgName',
+    	          children: 'zones',
+    	          isLeaf: 'leaf'
+    	      },
+  			  dialogVisibleAdd:false,
+  			  formData:{}
+    	  }
+      },
+      created: function(){
+		///web/orgInfo
+    	  
+      },
+      methods: {
+    	  loadNode(node, resolve) {
+    		  var This = this;
+    		  var orgNode = node.data || {orgId:0};
+    		  axios.get('/web/orgInfo/children/'+orgNode.orgId,{headers: {'X-tenant-Token':sessionStorage.getItem("X-tenant-Token")}}).then(function (response) {
+	       		  var result = response.data;
+	       		  if(result.code==0){
+	       			return resolve(result.data);
+	              }
+	       	  });
+    	  },
+    	  addForm(){
+				this.dialogVisibleAdd = true;
+				var checkedNodes = this.$refs.orgTree.getCheckedNodes();
+				var checkNode = checkedNodes[0];
+				this.formData = {parentId:checkNode.parentId, parentOrgName:checkNode.orgName,parentOrgId:checkNode.orgId,orgName:""};
+				console.log(this.formData)
+			},
+		  editForm(){
+				this.dialogVisibleEdit = true;
+				var checkedNodes = this.$refs.orgTree.getCheckedNodes();
+				var checkNode = checkedNodes[0];
+				this.formData = {parentId:checkNode.parentId, parentOrgName:checkNode.orgName,parentOrgId:checkNode.orgId,orgName:""};
+				console.log(this.formData)
+			},
+		  addAction(){
+				var This = this;
+				axios.post('/web/orgInfo/add',this.formData,{headers: {'X-tenant-Token':sessionStorage.getItem("X-tenant-Token")}}).then(function (response) {
+	       		var result = response.data;
+	       		if(result.code==0){
+	       		   This.dialogVisibleAdd = false;
+	       		   This.$message({showClose: true,message: '新增成功',type: 'success'});
+	            }
+	       	  });
+			}
+      }
+    })
+  </script>
+</html>
