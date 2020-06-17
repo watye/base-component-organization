@@ -22,4 +22,11 @@ public interface OrganizationInfoMapper extends CrudMapper<OrganizationInfo> {
 	 */
 	int updatePathByParent(@Param("parentIdPath") String parentIdPath);
 	
+	/**
+	 * 是否叶子组织
+	 * @param idPath 组织路径
+	 * @return 叶子节点：true，否则false
+	 */
+	boolean isLeaf(@Param("idPath") String idPath);
+	
 }

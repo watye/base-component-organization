@@ -125,11 +125,12 @@ public class TenantInfoServiceImpl implements TenantInfoService {
 		Objects.requireNonNull(tenantId);
 		Objects.requireNonNull(email);
 		String key = CacheUtils.getCacheKey(Constants.PROJECT_NAME, Constants.TENANT_TOKEN, tenantId+"-"+email);
-		String token = redisTemplate.opsForValue().get(key).toString();
+		Object token = redisTemplate.opsForValue().get(key);
 		if(Objects.nonNull(token)){
 			redisTemplate.expire(key, Constants.TOKEN_EXPIRE_TIME, TimeUnit.MINUTES);
+			return token.toString();
 		}
-		return token;
+		return null;
 	}
 	
 	private void saveLoginInfo(TenantLoginInfo tenantLoginInfo) {

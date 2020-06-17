@@ -21,7 +21,7 @@ import com.talelife.framework.entity.PageQueryParameter;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class OrgInfoControllerTest extends AbstractControllerTest{
 	private static Long orgId = null;
-	private static String TOKEN = "3c977cd3-4a09-4c48-b291-8529d9da9b3b";
+	private static String TOKEN = "2dfd8cde-df4d-4011-93b5-d6f8b85a8621";
 	@Test
 	public void testSave() throws Exception{
 		OrgInfoAdd add = new OrgInfoAdd();
@@ -59,6 +59,22 @@ public class OrgInfoControllerTest extends AbstractControllerTest{
 		edit.setOrgName("dept_ud1");
 		edit.setParentOrgId(452792944735293522L);
 		mvc.perform(put("/web/orgInfo/"+orgId,JSON.toJSONString(edit), getTokenParam(TOKEN)))
+		.andExpect(MockMvcResultMatchers.status().isOk())
+		.andDo(MockMvcResultHandlers.print());
+	}
+	
+	@Test
+	public void testDelete() throws Exception{
+		orgId = 455365727348592640L;
+		mvc.perform(delete("/web/orgInfo/"+orgId,null, getTokenParam(TOKEN)))
+		.andExpect(MockMvcResultMatchers.status().isOk())
+		.andDo(MockMvcResultHandlers.print());
+	}
+	
+	@Test
+	public void testChildren() throws Exception{
+		orgId = 452792944735293522L;
+		mvc.perform(get("/web/orgInfo/children/"+orgId,null, getTokenParam(TOKEN)))
 		.andExpect(MockMvcResultMatchers.status().isOk())
 		.andDo(MockMvcResultHandlers.print());
 	}

@@ -94,6 +94,25 @@ public class OrganizationInfoServiceImpl implements OrganizationInfoService {
 		mapper.updatePathByParent(sourceOrgInfo.getIdPath());
 	}
 
+	@Override
+	public boolean deleteById(Long id) {
+		Objects.requireNonNull(id);
+		OrganizationInfo orgInfo = getById(id);
+		if(Objects.isNull(orgInfo)){
+			ExceptionUtils.throwParameterException(ExceptionCode.ORG_NOT_FOUNT.getCode(), ExceptionCode.ORG_NOT_FOUNT.getMessage());
+		}
+		
+		//叶子组织才允许删除
+		if(!mapper.isLeaf(orgInfo.getIdPath())){
+			ExceptionUtils.throwParameterException(ExceptionCode.ORG_EXIST_CHILD.getCode(), ExceptionCode.ORG_EXIST_CHILD.getMessage());
+		}
+		
+		//组织下无用户才允许删除
+		
+		
+		return OrganizationInfoService.super.deleteById(id);
+	}
+
 	/**
 	 * 更新本组织信息
 	 * @param orgInfoUpdate 更新内容

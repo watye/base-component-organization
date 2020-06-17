@@ -359,12 +359,12 @@
 	</update>
 
 	<delete id="deleteById">
-		delete from t_organization_info
+		update t_organization_info set is_deleted = 1
 		where org_id = #{id}
 	</delete>
 
 	<delete id="deleteByIds">
-		delete from t_organization_info
+		update t_organization_info set is_deleted = 1
 		where org_id in
 		<foreach collection="ids" item="item" index="index" open="("
 			close=")" separator=",">
@@ -374,7 +374,7 @@
 
 	<delete id="delete"
 		parameterType="com.talelife.base.component.organization.dao.entity.OrganizationInfo">
-		delete from t_organization_info where 1=1
+		update t_organization_info set is_deleted = 1 where 1=1
 		<include refid="whereSql" />
 	</delete>
 	
@@ -383,4 +383,9 @@
 		update t_organization_info set id_path=concat(#{parentIdPath},id_path,',') where id_path like #{idPath} 
 		and id_path &lt;&gt; #{parentIdPath}
 	</update>
+	
+	<select id="isLeaf" resultType="java.lang.Boolean">
+		<bind name="idPathLike" value="idPath+'%'"/>
+		SELECT IFNULL((select 0 from t_organization_info where id_path like #{idPathLike} and id_path &lt;&gt; #{idPath} limit 1)  ,1)
+	</select>
 </mapper>

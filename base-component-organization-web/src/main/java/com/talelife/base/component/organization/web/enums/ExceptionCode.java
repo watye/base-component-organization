@@ -40,7 +40,11 @@ public enum ExceptionCode {
 	/**
 	 * 组织不存在
 	 */
-	ORG_NOT_FOUNT(1006,"组织不存在");
+	ORG_NOT_FOUNT(2000,"组织不存在"),
+	/**
+	 * 存在下级部门，不允许删除
+	 */
+	ORG_EXIST_CHILD(2001,"存在下级部门，不允许删除");
 	
 	private Integer code;
 	private String message;

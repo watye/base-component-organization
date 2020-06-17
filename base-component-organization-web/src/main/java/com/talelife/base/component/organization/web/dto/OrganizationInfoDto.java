@@ -1,6 +1,7 @@
 package com.talelife.base.component.organization.web.dto;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -34,7 +35,31 @@ public class OrganizationInfoDto implements Serializable{
 	 */
 	@ApiModelProperty(value = "父组织id")
 	private Long parentOrgId;
-
+	/**
+	 * 父组织名称
+	 */
+	@ApiModelProperty(value = "父组织名称")
+	private String parentOrgName;
+	/**
+	 * 员工数量
+	 */
+	private Integer memberCount;
+	/**
+	 * 创建日期
+	 */
+	private Date gmtCreate;
+	public Integer getMemberCount() {
+		return memberCount;
+	}
+	public void setMemberCount(Integer memberCount) {
+		this.memberCount = memberCount;
+	}
+	public Date getGmtCreate() {
+		return gmtCreate;
+	}
+	public void setGmtCreate(Date gmtCreate) {
+		this.gmtCreate = gmtCreate;
+	}
 	public void setTenantId(Long tenantId) {
 		this.tenantId = tenantId;
 	}
@@ -58,5 +83,11 @@ public class OrganizationInfoDto implements Serializable{
 	}
 	public Long getParentOrgId() {
 		return parentOrgId;
+	}
+	public String getParentOrgName() {
+		return parentOrgName;
+	}
+	public void setParentOrgName(String parentOrgName) {
+		this.parentOrgName = parentOrgName;
 	}
 }

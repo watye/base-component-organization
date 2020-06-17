@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.talelife.base.component.organization.web.interceptor.LoginInterceptor;
 import com.talelife.framework.interceptor.ResponseResultInterceptor;
@@ -18,7 +19,8 @@ import com.talelife.framework.interceptor.ResponseResultInterceptor;
  *
  */
 @Configuration
-public class MvcInterceptorConfig extends WebMvcConfigurationSupport {
+public class MvcInterceptorConfig implements WebMvcConfigurer {
+	
 	private static final String STATIC_RESOURCE_PATH = "/static/**";
 	private static List<String> nonLoginPath = new ArrayList<>();
 	static{
@@ -31,14 +33,13 @@ public class MvcInterceptorConfig extends WebMvcConfigurationSupport {
 	@Autowired
 	private LoginInterceptor loginInterceptor;
 	@Override
-	protected void addInterceptors(InterceptorRegistry registry) {
+	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(responseResultInterceptor).addPathPatterns("/**").excludePathPatterns(STATIC_RESOURCE_PATH);
 		registry.addInterceptor(loginInterceptor).addPathPatterns("/web/**").excludePathPatterns(nonLoginPath);
-		super.addInterceptors(registry);
 	}
 	
 	@Override
-	protected void addResourceHandlers(ResourceHandlerRegistry registry) {
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry.addResourceHandler(STATIC_RESOURCE_PATH).addResourceLocations("classpath:/static/");
 	}
 

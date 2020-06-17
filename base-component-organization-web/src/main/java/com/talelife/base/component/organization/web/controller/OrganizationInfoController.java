@@ -2,6 +2,7 @@ package com.talelife.base.component.organization.web.controller;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import javax.annotation.Resource;
 
@@ -20,6 +21,7 @@ import com.github.pagehelper.PageInfo;
 import com.imadcn.framework.idworker.generator.IdGenerator;
 import com.talelife.base.component.organization.dao.entity.OrganizationInfo;
 import com.talelife.base.component.organization.web.dto.OrganizationInfoDto;
+import com.talelife.base.component.organization.web.enums.ExceptionCode;
 import com.talelife.base.component.organization.web.service.OrganizationInfoService;
 import com.talelife.base.component.organization.web.util.UserContext;
 import com.talelife.base.component.organization.web.vo.OrgInfoAdd;
@@ -31,6 +33,7 @@ import com.talelife.framework.entity.Page;
 import com.talelife.framework.entity.PageQueryParameter;
 import com.talelife.framework.enums.YesNoEnum;
 import com.talelife.framework.util.BeanUtils;
+import com.talelife.framework.util.ExceptionUtils;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -65,6 +68,9 @@ public class OrganizationInfoController extends BaseController {
 	@PostMapping(value = "/page")
 	public Page<OrganizationInfoDto> page(@Validated @RequestBody PageQueryParameter<OrgInfoQuery> pageQuery) {
 		OrganizationInfo orgInfo = BeanUtils.map(pageQuery.getQuery(), OrganizationInfo.class);
+		long tenantId = UserContext.getLoginInfo().getTenantId();
+		orgInfo.setTenantId(tenantId);
+		orgInfo.setIsDeleted(YesNoEnum.NO.getValue());
 		PageInfo<OrganizationInfo> page = orgInfoService.findListPage(orgInfo,pageQuery.getPageNum(), pageQuery.getPageSize());
 		List<OrganizationInfoDto> orgInfoList = BeanUtils.mapAsList(page.getList(), OrganizationInfo.class, OrganizationInfoDto.class);
 		return new Page<>(page,orgInfoList);
@@ -74,7 +80,12 @@ public class OrganizationInfoController extends BaseController {
 	@GetMapping(value="/{id}")
 	public OrganizationInfoDto getOrgInfo(@PathVariable @ApiParam(value="id") Long id) {
 		OrganizationInfo orgInfo = orgInfoService.getById(id);
-		return BeanUtils.map(orgInfo, OrganizationInfoDto.class);
+		if(Objects.isNull(orgInfo)){
+			ExceptionUtils.throwParameterException(ExceptionCode.ORG_NOT_FOUNT.getCode(), ExceptionCode.ORG_NOT_FOUNT.getMessage());
+		}
+		OrganizationInfoDto infoDto = BeanUtils.map(orgInfo, OrganizationInfoDto.class);
+		infoDto.setParentOrgName(orgInfo.getParentOrgId()>0?orgInfoService.getById(orgInfo.getParentOrgId()).getOrgName():"");
+		return infoDto;
 	}
 
 	@ApiOperation(value = "修改")
@@ -101,5 +112,4 @@ public class OrganizationInfoController extends BaseController {
 		
 		return BeanUtils.mapAsList(orgInfoService.findList(query,Arrays.asList("tenantId","orgId","orgName","parentOrgId")), OrganizationInfo.class, OrganizationInfoDto.class);
 	}
-	
 }
