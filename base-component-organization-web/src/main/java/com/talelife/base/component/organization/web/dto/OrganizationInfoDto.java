@@ -41,6 +41,10 @@ public class OrganizationInfoDto implements Serializable{
 	@ApiModelProperty(value = "父组织名称")
 	private String parentOrgName;
 	/**
+	 * 排序号
+	 */
+	private Integer sort;
+	/**
 	 * 员工数量
 	 */
 	private Integer memberCount;
@@ -89,5 +93,11 @@ public class OrganizationInfoDto implements Serializable{
 	}
 	public void setParentOrgName(String parentOrgName) {
 		this.parentOrgName = parentOrgName;
+	}
+	public Integer getSort() {
+		return sort;
+	}
+	public void setSort(Integer sort) {
+		this.sort = sort;
 	}
 }

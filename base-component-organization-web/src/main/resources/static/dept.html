@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <link rel="stylesheet" href="/static/element-ui/lib/theme-chalk/index.css">
 
-  <style scoped>
+  <style >
 #app{
     width: 100%;
     height: 100%;
@@ -14,19 +14,31 @@ html,body{
 	width: 100%;
     height: 100%;
 }
+/*去掉标题选中*/
+:focus{
+   outline:0;
+}
+/*固定底部*/
+.el-drawer__body{
+   overflow-y: scroll;
+   margin-bottom: 50px;
+}
+.drawer__footer{
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  border-top: 1px solid #e8e8e8;
+  padding: 10px 16px;
+  text-align: right;
+  background-color: white;
+}
 </style>
 </head>
 <body>
   <div id="app">
     <el-container style="width:100%;height:100%;padding:20px">
-    	<!-- <el-header style="padding-bottom:0">
-	    	<el-row>
-			  <el-button size="mini" @click="addForm()">新增</el-button>
-			  <el-button size="mini">默认按钮</el-button>
-			  <el-button size="mini">默认按钮</el-button>
-			</el-row>
-		</el-header> -->
-		<el-container>
+	<el-container>
     <el-aside width="300px">
     	<el-tree
 		  :props="props"
@@ -40,11 +52,13 @@ html,body{
 		<el-main>
 		 	<el-row>
 			  <el-button size="mini" @click="addForm()">添加子部门</el-button>
-			  <el-button size="mini">默认按钮</el-button>
-			  <el-button size="mini">默认按钮</el-button>
+			  <el-button size="mini" @click="editForm()">编辑部门</el-button>
+			  <el-button size="mini" @click="deleteAction()">删除部门</el-button>
+			  <el-button v-if="!editSortStatus" size="mini"  @click="editSort()">调整排序</el-button>
+			  <el-button v-if="editSortStatus" size="mini" @click="editSortAction()">保存排序</el-button>
 			</el-row>
 			<el-row>
-			  <el-table
+			  <el-table ref="dragTable"
 			    :data="page.data"
 			    stripe
 			    style="width: 100%">
@@ -77,21 +91,21 @@ html,body{
 		</el-main>
 	</el-container>
 	<div>
-			<el-dialog title="新增部门" :visible.sync="dialogVisibleAdd" width="550px">
-				<el-form :model="formData">
+			<el-drawer title="新增部门" :with-header="true" :with-footer="true" :visible.sync="dialogVisibleAdd">
+				<el-form :model="formData" style="margin-right:20px">
 					<el-form-item label="所属上级" :label-width="'100px'">
-						<el-input v-model="formData.parentOrgName" auto-complete="off"></el-input>
+						<el-input v-model="formData.parentOrgName" disabled auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="部门名称" :label-width="'100px'">
 						<el-input v-model="formData.orgName" auto-complete="off"></el-input>
 					</el-form-item>
 				</el-form>
-				<span slot="footer" class="dialog-footer">
+				<div class="dialog-footer">
 					<el-button size="mini" @click="dialogVisibleAdd = false">取 消</el-button>
 					<el-button size="mini" type="primary" @click="addAction()">保 存</el-button>
-				</span>
-			</el-dialog>
-			<el-dialog title="编辑部门" :visible.sync="dialogVisibleEdit" width="550px">
+				</div>
+			</el-drawer>
+			<el-drawer title="编辑部门" :with-header="true" :visible.sync="dialogVisibleEdit">
 				<el-form :model="formData">
 					<el-form-item label="所属上级" :label-width="'100px'">
 						<el-input v-model="formData.parentOrgName" auto-complete="off"></el-input>
@@ -100,17 +114,18 @@ html,body{
 						<el-input v-model="formData.orgName" auto-complete="off"></el-input>
 					</el-form-item>
 				</el-form>
-				<span slot="footer" class="dialog-footer">
+				<span class="dialog-footer">
 					<el-button size="mini" @click="dialogVisibleEdit = false">取 消</el-button>
 					<el-button size="mini" type="primary" @click="editAction()">保 存</el-button>
 				</span>
-			</el-dialog>
+			</el-drawer>
 		</div>
   </div>
 </body>
 <script src="/static/js/vue/dist/vue.js"></script>
 <script src="/static/element-ui/lib/index.js"></script>
 <script src="/static/js/vue/dist/axios.min.js"></script>
+<script src="/static/js/vue/dist/Sortable.min.js"></script>
  
   <script type="text/javascript">
   
@@ -125,16 +140,54 @@ html,body{
     	      },
   			  dialogVisibleAdd:false,
   			  dialogVisibleEdit:false,
+  			  editSortStatus:false,
   			  clickNode:{},
   			  formData:{},
-  			  page: {}
+  			  page: {},
+  			  sourceList:[],
+  			  targetList:[]
     	  }
       },
       created: function(){
 		///web/orgInfo
-    	  
       },
       methods: {
+    	  editSort(){
+    		  This = this;
+    		  const el = this.$refs.dragTable.$el.querySelectorAll('.el-table__body-wrapper > table > tbody')[0];
+    		  this.sortable = Sortable.create(el,{
+    			animation: 150,
+    			ghostClass:'blue-background-class',
+    		    setData:function(dataTransfer){
+    		      //dataTransfer.setData('Text', '')
+    		      console.log(dataTransfer)
+    		    },
+    		    onEnd: evt => {
+    		     
+    		      console.log(evt);
+    		      This.sourceList.push(evt.oldIndex);
+    		      This.targetList.push(evt.newIndex);
+    		      console.log("source:"+This.sourceList);
+    		      console.log("target:"+This.targetList);
+    		    }
+    		  })
+    		  this.editSortStatus = true;
+    	   },
+    	   editSortAction(){
+     		  This = this;
+    		  this.editSortStatus = false;
+    		  var sortJson = [];
+    		  var data = This.page.data;
+    		  for(var i=0; i<data.length;i++){
+    			  var item = data[i];
+    			  sortJson.push({orgId:item.orgId,sort:item.sort});
+    		  }
+     		  for(var i=0;i<this.sourceList.length;i++){
+     			  var oldSort = sortJson[this.sourceList[i]].sort;
+     			  
+     			  
+     		  }
+     	   },
     	  loadNode(node, resolve) {
     		  console.log(node)
     		  var This = this;
@@ -152,6 +205,7 @@ html,body{
     		  axios.post('/web/orgInfo/page',query,{headers: {'X-tenant-Token':sessionStorage.getItem("X-tenant-Token")}}).then(function (response) {
 	       		  var result = response.data;
 	       		  if(result.code==0){
+	       			result.data.total = parseInt(result.data.total);
 	       			This.page = result.data;
 	              }
 	       	  });
@@ -173,11 +227,14 @@ html,body{
 			  this.formData = {parentOrgName:this.clickNode.orgName,parentOrgId:this.clickNode.orgId,orgName:""};
 		  },
 		  editForm(){
+			    This = this;
 				this.dialogVisibleEdit = true;
-				var checkedNodes = this.$refs.orgTree.getCheckedNodes();
-				var checkNode = checkedNodes[0];
-				this.formData = {parentId:checkNode.parentId, parentOrgName:checkNode.orgName,parentOrgId:checkNode.orgId,orgName:""};
-				console.log(this.formData)
+				axios.get('/web/orgInfo/'+this.clickNode.orgId,{headers: {'X-tenant-Token':sessionStorage.getItem("X-tenant-Token")}}).then(function (response) {
+		       		  var result = response.data;
+		       		  if(result.code==0){
+		       			This.formData = result.data;
+		              }
+		       	  });
 			},
 		  addAction(){
 				var This = this;
@@ -189,6 +246,35 @@ html,body{
 	       		   This.$message({showClose: true,message: '新增成功',type: 'success'});
 	            }
 	       	  });
+			},
+		  editAction(){
+				var This = this;
+				axios.put('/web/orgInfo/'+this.formData.orgId,{orgName:this.formData.orgName,parentOrgId:this.formData.parentOrgId},{headers: {'X-tenant-Token':sessionStorage.getItem("X-tenant-Token")}}).then(function (response) {
+	       		var result = response.data;
+	       		if(result.code==0){
+	       		   This.dialogVisibleEdit = false;
+	       		   This.$message({showClose: true,message: '修改成功',type: 'success'});
+	       		   location.reload();
+	            }
+	       	  });
+			},
+			deleteAction(){
+				var This = this;
+			     this.$confirm('确定删除该部门?', '提示', {
+			            confirmButtonText: '确定',
+			            cancelButtonText: '取消',
+			            type: 'warning'
+			          }).then(() => {
+			        	  axios.delete('/web/orgInfo/'+this.clickNode.orgId,{headers: {'X-tenant-Token':sessionStorage.getItem("X-tenant-Token")}}).then(function (response) {
+					       		var result = response.data;
+					       		if(result.code==0){
+					       		   This.$message({showClose: true,message: '删除成功',type: 'success'});
+					       		   location.reload();
+					            }
+					       	  });
+			          }).catch(() => {
+			            //几点取消的提示
+			          });
 			},
 		   dateFormat(row,column){
 	          const sourceDate= new Date(row[column.property]);

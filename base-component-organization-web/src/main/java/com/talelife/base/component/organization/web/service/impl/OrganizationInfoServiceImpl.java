@@ -108,8 +108,6 @@ public class OrganizationInfoServiceImpl implements OrganizationInfoService {
 		}
 		
 		//组织下无用户才允许删除
-		
-		
 		return OrganizationInfoService.super.deleteById(id);
 	}
 
@@ -124,8 +122,8 @@ public class OrganizationInfoServiceImpl implements OrganizationInfoService {
 		entity.setOrgName(orgInfoUpdate.getOrgName());
 		
 		Long parentOrgId = orgInfoUpdate.getParentOrgId();
-		//迁移组织
-		if(Objects.nonNull(parentOrgId)){
+		
+		if(havingMoveOrg(sourceOrgInfo, parentOrgId)){
 			OrganizationInfo parentOrgInfo = getById(parentOrgId);
 			if(Objects.isNull(parentOrgInfo)){
 				ExceptionUtils.throwParameterException(ExceptionCode.ORG_NOT_FOUNT.getCode(), ExceptionCode.ORG_NOT_FOUNT.getMessage());
@@ -134,7 +132,6 @@ public class OrganizationInfoServiceImpl implements OrganizationInfoService {
 			entity.setIdPath(String.format(MIDDLE_ID_PATH_FORMAT, parentOrgInfo.getIdPath(), entity.getOrgId()));
 			entity.setNamePath(String.format(MIDDLE_ID_PATH_FORMAT, parentOrgInfo.getNamePath(), entity.getOrgName()));
 		}else{
-			//不迁移组织
 			String[] pathArray = sourceOrgInfo.getNamePath().split(",");
 			pathArray[pathArray.length-1] = entity.getOrgName();
 			entity.setNamePath(Arrays.asList(pathArray).stream().collect(Collectors.joining(",","",",")));
@@ -142,6 +139,16 @@ public class OrganizationInfoServiceImpl implements OrganizationInfoService {
 		
 		EntityUtils.setModifyProperty(entity);
 		updateById(entity);
+	}
+
+	/**
+	 * 是否移动 组织
+	 * @param sourceOrgInfo 原组织
+	 * @param parentOrgId 修改提交的父节点id
+	 * @return
+	 */
+	private boolean havingMoveOrg(OrganizationInfo sourceOrgInfo, Long parentOrgId) {
+		return Objects.nonNull(parentOrgId) && parentOrgId.longValue() != sourceOrgInfo.getParentOrgId().longValue();
 	}
 	
 }
