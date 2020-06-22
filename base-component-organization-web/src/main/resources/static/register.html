@@ -36,41 +36,41 @@ label.el-checkbox.rememberme {
             <h3 class="title">企业注册</h3>
             <el-form-item label="企业名称" :label-width="'100px'">
                 <el-input type="text" 
-                    v-model="loginForm.tenantName" 
+                    v-model="registerForm.tenantName" 
                     auto-complete="off" 
-                    placeholder="企业注册"
+                    placeholder="企业名称"
                 ></el-input>
             </el-form-item>
             <el-form-item label="手机号码" :label-width="'100px'">
                 <el-input type="text" 
-                    v-model="loginForm.phone" 
+                    v-model="registerForm.phone" 
                     auto-complete="off" 
                     placeholder="手机号码"
                 ></el-input>
             </el-form-item>
            <el-form-item label="邮箱" :label-width="'100px'">
                 <el-input type="text" 
-                    v-model="loginForm.email" 
+                    v-model="registerForm.email" 
                     auto-complete="off" 
                     placeholder="邮箱"
                 ></el-input>
             </el-form-item>
             <el-form-item label="管理密码" :label-width="'100px'">
                 <el-input type="password" 
-                    v-model="loginForm.password" 
+                    v-model="registerForm.password" 
                     auto-complete="off" 
                     placeholder="管理密码"
                 ></el-input>
             </el-form-item>
             <el-form-item label="确认密码" :label-width="'100px'">
                 <el-input type="password" 
-                    v-model="loginForm.password" 
+                    v-model="registerForm.rePassword" 
                     auto-complete="off" 
-                    placeholder="管理密码"
+                    placeholder="确认密码"
                 ></el-input>
             </el-form-item>
             <el-form-item style="width:100%;">
-                <el-button type="primary" style="width:100%;" @click="handleSubmit" :loading="logining">注册</el-button>
+                <el-button type="primary" style="width:100%;" @click="handleSubmit" :loading="loading">注册</el-button>
             </el-form-item>
         </el-form>
     </div>
@@ -84,40 +84,40 @@ label.el-checkbox.rememberme {
       el: '#app',
       data: function() {
     	  return {
-              logining: false,
-              loginForm: {
-                  username: 'dev219@qq.com',
-                  password: '123',
-              },
+              loading: false,
+              registerForm:{},
               rules: {
-                  username: [{required: true, message: '请输入账号', trigger: 'blur'}],
-                  password: [{required: true, message: '请输入密码', trigger: 'blur'}]
-              },
-              checked: false
+                  tenantName: [{required: true, message: '请输入企业名称', trigger: 'blur'}],
+                  phone: [{required: true, message: '请输入手机号码', trigger: 'blur'}],
+                  email: [{required: true, message: '请输入邮箱', trigger: 'blur'}],
+                  password: [{required: true, message: '请输入管理密码', trigger: 'blur'}],
+                  rePassword: [{required: true, message: '请输入确认密码', trigger: 'blur'}]
+              }
           }
       },
       methods: {
           handleSubmit(event){
-              this.$refs.loginForm.validate((valid) => {
+              this.$refs.registerForm.validate((valid) => {
                   if(valid){
-                      this.logining = true;
+                      this.loading = true;
                       This = this;
                       
-                      axios.post('/web/tenantInfo/login', {
-                   		  account:This.loginForm.username,password:This.loginForm.password
+                      axios.post('/web/tenantInfo/register', {
+                   		  tenantName:This.registerForm.tenantName,phone:This.registerForm.phone,email:This.registerForm.email,password:This.registerForm.password
                    	  }).then(function (response) {
                    		  var result = response.data;
                    		  if(result.code==0){
-                           	  This.logining = false;
-                           	  sessionStorage.setItem("X-tenant-Token",result.data.token);
-                           	  location.href="/static/index.html"
+                   			  This.$message({message: '注册成功',type: 'success'});
+                   			  setTimeout(function(){
+                   				location.href="/static/login.html"
+                   			  },3000);
                           }else{
 	                       	  This.$message.error(result.message);
-	                       	  This.logining = false;
+	                       	  This.loading = false;
                           }
                    	  }).catch(function (error) {
-                   		  This.$message.error("登录失败");
-                   		  This.logining = false;
+                   		  This.$message.error("注册失败");
+                   		  This.loading = false;
                    	  });
                   }else{
                       return false;

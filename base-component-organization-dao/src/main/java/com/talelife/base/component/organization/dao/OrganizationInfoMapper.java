@@ -1,7 +1,11 @@
 package com.talelife.base.component.organization.dao;
 
+import com.talelife.base.component.organization.dao.dto.OrgInfoSort;
 import com.talelife.base.component.organization.dao.entity.OrganizationInfo;
 import com.talelife.framework.mapper.CrudMapper;
+
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -28,5 +32,11 @@ public interface OrganizationInfoMapper extends CrudMapper<OrganizationInfo> {
 	 * @return 叶子节点：true，否则false
 	 */
 	boolean isLeaf(@Param("idPath") String idPath);
+
+	/**
+	 * 排序
+	 * @param infoSorts 排序数据
+	 */
+	void batchSort(List<OrgInfoSort> infoSorts);
 	
 }

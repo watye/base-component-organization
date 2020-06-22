@@ -26,6 +26,7 @@ import com.talelife.base.component.organization.web.service.OrganizationInfoServ
 import com.talelife.base.component.organization.web.util.UserContext;
 import com.talelife.base.component.organization.web.vo.OrgInfoAdd;
 import com.talelife.base.component.organization.web.vo.OrgInfoQuery;
+import com.talelife.base.component.organization.web.vo.OrgInfoSort;
 import com.talelife.base.component.organization.web.vo.OrgInfoUpdate;
 import com.talelife.framework.annotation.ResponseResult;
 import com.talelife.framework.controller.BaseController;
@@ -111,5 +112,11 @@ public class OrganizationInfoController extends BaseController {
 		query.setIsDeleted(YesNoEnum.NO.getValue());
 		
 		return BeanUtils.mapAsList(orgInfoService.findList(query,Arrays.asList("tenantId","orgId","orgName","parentOrgId")), OrganizationInfo.class, OrganizationInfoDto.class);
+	}
+	
+	@ApiOperation(value = "排序")
+	@PutMapping(value="/batchSort")
+	public void batchSort(@Validated @RequestBody List<OrgInfoSort> orgInfoSorts) {
+		orgInfoService.sort(orgInfoSorts);
 	}
 }

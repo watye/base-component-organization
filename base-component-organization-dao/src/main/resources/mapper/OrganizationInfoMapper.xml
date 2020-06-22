@@ -149,7 +149,7 @@
 		select
 		<include refid="baseColumns" />
 		from t_organization_info where 1=1
-		<include refid="whereSql" />
+		<include refid="whereSql" /> order by sort asc
 	</select>
 
 	<select id="findAll" resultMap="resultMap">
@@ -388,4 +388,10 @@
 		<bind name="idPathLike" value="idPath+'%'"/>
 		SELECT IFNULL((select 0 from t_organization_info where id_path like #{idPathLike} and id_path &lt;&gt; #{idPath} limit 1)  ,1)
 	</select>
+	
+	<update id="batchSort" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=";">
+			update t_organization_info set sort = #{item.sort} where org_id = #{item.orgId}
+		</foreach>
+	</update>
 </mapper>

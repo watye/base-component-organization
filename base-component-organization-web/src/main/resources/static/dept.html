@@ -159,16 +159,10 @@ html,body{
     			animation: 150,
     			ghostClass:'blue-background-class',
     		    setData:function(dataTransfer){
-    		      //dataTransfer.setData('Text', '')
-    		      console.log(dataTransfer)
     		    },
     		    onEnd: evt => {
-    		     
-    		      console.log(evt);
     		      This.sourceList.push(evt.oldIndex);
     		      This.targetList.push(evt.newIndex);
-    		      console.log("source:"+This.sourceList);
-    		      console.log("target:"+This.targetList);
     		    }
     		  })
     		  this.editSortStatus = true;
@@ -176,6 +170,7 @@ html,body{
     	   editSortAction(){
      		  This = this;
     		  this.editSortStatus = false;
+    		  //处理排序数据
     		  var sortJson = [];
     		  var data = This.page.data;
     		  for(var i=0; i<data.length;i++){
@@ -183,13 +178,22 @@ html,body{
     			  sortJson.push({orgId:item.orgId,sort:item.sort});
     		  }
      		  for(var i=0;i<this.sourceList.length;i++){
-     			  var oldSort = sortJson[this.sourceList[i]].sort;
-     			  
-     			  
+     			 var oldIndex = this.sourceList[i];
+     			 var newIndex = this.targetList[i];
+     			 var oldOrgId = sortJson[oldIndex].orgId;
+     			 sortJson[oldIndex].orgId = sortJson[newIndex].orgId;
+     			 sortJson[newIndex].orgId = oldOrgId;
      		  }
+     		  //保存排序
+     		  console.log(sortJson)
+     		  axios.put('/web/orgInfo/batchSort',sortJson,{headers: {'X-tenant-Token':sessionStorage.getItem("X-tenant-Token")}}).then(function (response) {
+	       		  var result = response.data;
+	       		  if(result.code==0){
+	       			This.$message({showClose: true,message: '保存成功',type: 'success'});
+	              }
+	       	  });
      	   },
     	  loadNode(node, resolve) {
-    		  console.log(node)
     		  var This = this;
     		  var expandNode = node.data || {orgId:0};
     		  axios.get('/web/orgInfo/children/'+expandNode.orgId,{headers: {'X-tenant-Token':sessionStorage.getItem("X-tenant-Token")}}).then(function (response) {
@@ -273,7 +277,7 @@ html,body{
 					            }
 					       	  });
 			          }).catch(() => {
-			            //几点取消的提示
+			            //点取消的提示
 			          });
 			},
 		   dateFormat(row,column){

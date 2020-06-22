@@ -1,6 +1,7 @@
 package com.talelife.base.component.organization.web.service.impl;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -14,9 +15,11 @@ import com.talelife.base.component.organization.dao.entity.OrganizationInfo;
 import com.talelife.base.component.organization.dao.entity.TenantInfo;
 import com.talelife.base.component.organization.web.enums.ExceptionCode;
 import com.talelife.base.component.organization.web.service.OrganizationInfoService;
+import com.talelife.base.component.organization.web.vo.OrgInfoSort;
 import com.talelife.base.component.organization.web.vo.OrgInfoUpdate;
 import com.talelife.framework.enums.YesNoEnum;
 import com.talelife.framework.mapper.CrudMapper;
+import com.talelife.framework.util.BeanUtils;
 import com.talelife.framework.util.EntityUtils;
 import com.talelife.framework.util.ExceptionUtils;
 /**
@@ -56,6 +59,7 @@ public class OrganizationInfoServiceImpl implements OrganizationInfoService {
 		}
 		entity.setIsDeleted(YesNoEnum.NO.getValue());
 		entity.setMemberCount(0);
+		entity.setSort(Integer.parseInt(String.valueOf(System.currentTimeMillis()/1000)));
 		EntityUtils.setCreateProperty(entity);
 		return OrganizationInfoService.super.save(entity);
 	}
@@ -109,6 +113,14 @@ public class OrganizationInfoServiceImpl implements OrganizationInfoService {
 		
 		//组织下无用户才允许删除
 		return OrganizationInfoService.super.deleteById(id);
+	}
+
+	@Override
+	public void sort(List<OrgInfoSort> orgInfoSorts) {
+		Objects.requireNonNull(orgInfoSorts);
+		if(!orgInfoSorts.isEmpty()){
+			mapper.batchSort(BeanUtils.mapAsList(orgInfoSorts, OrgInfoSort.class, com.talelife.base.component.organization.dao.dto.OrgInfoSort.class));
+		}
 	}
 
 	/**
