@@ -122,6 +122,13 @@ public class OrganizationInfoServiceImpl implements OrganizationInfoService {
 			mapper.batchSort(BeanUtils.mapAsList(orgInfoSorts, OrgInfoSort.class, com.talelife.base.component.organization.dao.dto.OrgInfoSort.class));
 		}
 	}
+	
+	@Override
+	public OrganizationInfo getRootOrgInfo(Long tenantId) {
+		OrganizationInfo query = new OrganizationInfo();
+		query.setTenantId(tenantId);
+		return get(query);
+	}
 
 	/**
 	 * 更新本组织信息

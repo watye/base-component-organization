@@ -30,5 +30,11 @@ public interface OrganizationInfoService extends CrudService<OrganizationInfo>{
 	 * @param orgInfoSorts 排序数据
 	 */
 	void sort(List<OrgInfoSort> orgInfoSorts);
+
+	/**
+	 * 查询根组织
+	 * @param tenantId 租户id
+	 */
+	OrganizationInfo getRootOrgInfo(Long tenantId);
 }
 

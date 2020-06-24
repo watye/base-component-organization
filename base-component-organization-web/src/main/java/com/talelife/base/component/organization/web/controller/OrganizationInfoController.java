@@ -55,6 +55,12 @@ public class OrganizationInfoController extends BaseController {
 	@Autowired
 	private IdGenerator idGenerator;
 	
+	@ApiOperation(value = "查询详情")
+	@GetMapping(value="/rootOrgInfo")
+	public OrganizationInfoDto getRootOrgInfo() {
+		return BeanUtils.map(orgInfoService.getRootOrgInfo(UserContext.getLoginInfo().getTenantId()), OrganizationInfoDto.class);
+	}
+	
 	@ApiOperation(value = "新增")
 	@PostMapping(value="/add")
 	public Long add(@Validated @RequestBody OrgInfoAdd orgInfoAdd) {
