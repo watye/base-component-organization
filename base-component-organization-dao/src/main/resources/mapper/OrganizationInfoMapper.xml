@@ -378,10 +378,19 @@
 		<include refid="whereSql" />
 	</delete>
 	
-	<update id="updatePathByParent">
-		<bind name="idPath" value="parentIdPath+'%'"/>
-		update t_organization_info set id_path=concat(#{parentIdPath},id_path,',') where id_path like #{idPath} 
-		and id_path &lt;&gt; #{parentIdPath}
+	<update id="updateChilrenOrgPath">
+		<bind name="oldIdPathLike" value="oldIdPath+'%'"/>
+		update t_organization_info set id_path=replace(id_path,#{oldIdPath},#{newIdPath}),
+		name_path=replace(name_path,#{oldNamePath},#{newNamePath})
+		where id_path like #{oldIdPathLike} 
+		and id_path &lt;&gt; #{oldIdPath}
+	</update>
+	
+	<update id="updateChilrenNamePath">
+		<bind name="oldIdPathLike" value="oldIdPath+'%'"/>
+		update t_organization_info set name_path=replace(name_path,#{oldNamePath},#{newNamePath})
+		where id_path like #{oldIdPathLike} 
+		and id_path &lt;&gt; #{oldIdPath}
 	</update>
 	
 	<select id="isLeaf" resultType="java.lang.Boolean">

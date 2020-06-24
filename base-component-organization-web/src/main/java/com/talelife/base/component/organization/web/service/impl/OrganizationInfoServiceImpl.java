@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.imadcn.framework.idworker.generator.IdGenerator;
 import com.talelife.base.component.organization.dao.OrganizationInfoMapper;
+import com.talelife.base.component.organization.dao.dto.OrgInfoPath;
 import com.talelife.base.component.organization.dao.entity.OrganizationInfo;
 import com.talelife.base.component.organization.dao.entity.TenantInfo;
 import com.talelife.base.component.organization.web.enums.ExceptionCode;
@@ -94,8 +95,6 @@ public class OrganizationInfoServiceImpl implements OrganizationInfoService {
 		
 		updateCurrentOrgInfo(orgInfoUpdate, sourceOrgInfo);
 		
-		//更新下级的路径信息
-		mapper.updatePathByParent(sourceOrgInfo.getIdPath());
 	}
 
 	@Override
@@ -153,21 +152,59 @@ public class OrganizationInfoServiceImpl implements OrganizationInfoService {
 		}else{
 			String[] pathArray = sourceOrgInfo.getNamePath().split(",");
 			pathArray[pathArray.length-1] = entity.getOrgName();
+			entity.setIdPath(sourceOrgInfo.getIdPath());
 			entity.setNamePath(Arrays.asList(pathArray).stream().collect(Collectors.joining(",","",",")));
 		}
 		
 		EntityUtils.setModifyProperty(entity);
 		updateById(entity);
+		
+		updateChilrenOrgPath(new OrgInfoPath(sourceOrgInfo.getIdPath(),sourceOrgInfo.getNamePath(),entity.getIdPath(),entity.getNamePath()));
 	}
 
 	/**
-	 * 是否移动 组织
+	 * 是否移动组织
 	 * @param sourceOrgInfo 原组织
 	 * @param parentOrgId 修改提交的父节点id
-	 * @return
+	 * @return 移动true，没移动false
 	 */
 	private boolean havingMoveOrg(OrganizationInfo sourceOrgInfo, Long parentOrgId) {
 		return Objects.nonNull(parentOrgId) && parentOrgId.longValue() != sourceOrgInfo.getParentOrgId().longValue();
 	}
 	
+	/**
+	 * 更新子组织路径
+	 * @param OrgInfoPath 路径对象
+	 */
+	private void updateChilrenOrgPath(OrgInfoPath orgInfoPath){
+		if(havingMoveOrg(orgInfoPath.getOldIdPath(), orgInfoPath.getNewIdPath())){
+			mapper.updateChilrenOrgPath(orgInfoPath);
+		}else if(havingRename(orgInfoPath.getOldNamePath(), orgInfoPath.getNewNamePath())){
+			mapper.updateChilrenNamePath(orgInfoPath);
+		}
+	}
+	
+	/**
+	 * 是否移动组织
+	 * @param oldIdPath 原路径id
+	 * @param newIdPath 新路径id
+	 * @return 移动true，没移动false
+	 */
+	private boolean havingMoveOrg(String oldIdPath, String newIdPath) {
+		Objects.requireNonNull(oldIdPath);
+		Objects.requireNonNull(newIdPath);
+		return !oldIdPath.equals(newIdPath);
+	}
+	
+	/**
+	 * 组织是否改名
+	 * @param oldNamePath 原路径名称
+	 * @param newNamePath 新路径名称
+	 * @return 改名true,没改名false
+	 */
+	private boolean havingRename(String oldNamePath, String newNamePath) {
+		Objects.requireNonNull(oldNamePath);
+		Objects.requireNonNull(newNamePath);
+		return !oldNamePath.equals(newNamePath);
+	}
 }

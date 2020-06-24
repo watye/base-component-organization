@@ -1,5 +1,6 @@
 package com.talelife.base.component.organization.dao;
 
+import com.talelife.base.component.organization.dao.dto.OrgInfoPath;
 import com.talelife.base.component.organization.dao.dto.OrgInfoSort;
 import com.talelife.base.component.organization.dao.entity.OrganizationInfo;
 import com.talelife.framework.mapper.CrudMapper;
@@ -20,11 +21,18 @@ import org.apache.ibatis.annotations.Param;
 public interface OrganizationInfoMapper extends CrudMapper<OrganizationInfo> {
 
 	/**
-	 * 更新路径
-	 * @param parentIdPath 父路径
-	 * @return
+	 * 更新子组织路径(包括idPath和namePath)
+	 * @param orgInfoPath 路径信息
+	 * @return 更新数量
 	 */
-	int updatePathByParent(@Param("parentIdPath") String parentIdPath);
+	int updateChilrenOrgPath(OrgInfoPath orgInfoPath);
+	
+	/**
+	 * 更新子组织路径(只更新namePath)
+	 * @param orgInfoPath 路径信息
+	 * @return 更新数量
+	 */
+	int updateChilrenNamePath(OrgInfoPath orgInfoPath);
 	
 	/**
 	 * 是否叶子组织
@@ -38,5 +46,4 @@ public interface OrganizationInfoMapper extends CrudMapper<OrganizationInfo> {
 	 * @param infoSorts 排序数据
 	 */
 	void batchSort(List<OrgInfoSort> infoSorts);
-	
 }
