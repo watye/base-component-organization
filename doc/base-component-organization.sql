@@ -11,7 +11,7 @@
  Target Server Version : 50727
  File Encoding         : 65001
 
- Date: 24/06/2020 08:52:17
+ Date: 24/06/2020 17:55:37
 */
 
 SET NAMES utf8mb4;
@@ -55,7 +55,9 @@ CREATE TABLE `t_organization_info`  (
   `gmt_create` datetime(0) NOT NULL COMMENT '创建时间',
   `gmt_modified` datetime(0) NOT NULL COMMENT '更新时间',
   PRIMARY KEY (`org_id`) USING BTREE,
-  INDEX `idx_id_path`(`id_path`) USING BTREE
+  INDEX `idx_id_path`(`id_path`) USING BTREE,
+  INDEX `idx_parent_org_id`(`parent_org_id`) USING BTREE,
+  INDEX `idx_tenant_id`(`tenant_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '组织表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -92,7 +94,8 @@ CREATE TABLE `t_tenant_info`  (
   `last_login_ip` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '最后登录IP',
   `gmt_create` datetime(0) NOT NULL COMMENT '创建时间',
   `gmt_modified` datetime(0) NOT NULL COMMENT '更新时间',
-  PRIMARY KEY (`tenant_id`) USING BTREE
+  PRIMARY KEY (`tenant_id`) USING BTREE,
+  UNIQUE INDEX `idx_phone_email`(`phone`, `email`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '租户表' ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;
