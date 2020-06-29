@@ -26,14 +26,14 @@ import com.talelife.framework.entity.PageQueryParameter;
 public class OrgInfoControllerTest extends AbstractControllerTest{
 	private static Long orgId = null;
 	private static Long rootOrgId = null;
-	private static String TOKEN = "f742d123-bdf4-4219-9285-dc89a9296681";
+	private static String TOKEN = "c869468a-1e45-4b48-8ef0-776393579cc6";
 	
 	@Test
 	public void test1000GetRootOrgInfo() throws Exception{
 		String response = mvc.perform(get("/web/orgInfo/rootOrgInfo", null, getTokenParam(TOKEN)))
 		.andExpect(MockMvcResultMatchers.status().isOk())
 		.andDo(MockMvcResultHandlers.print()).andReturn().getResponse().getContentAsString();
-		rootOrgId = JSONObject.parseObject(response).getLong("data");
+		rootOrgId = JSONObject.parseObject(response).getJSONObject("data").getLong("orgId");
 	}
 	
 	@Test
