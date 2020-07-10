@@ -160,17 +160,6 @@
 		<include refid="whereSql" />
 	</select>
 
-	<select id="getByAccountPassword" resultMap="resultMap">
-		select
-		<include refid="baseColumns" />
-		from t_tenant_info where phone = #{account} and password=#{password}
-		union
-		
-		select
-		<include refid="baseColumns" />
-		from t_tenant_info where email=#{account} and password=#{password}
-	</select>
-
 	<insert id="save"
 		parameterType="com.talelife.base.component.organization.dao.entity.TenantInfo">
 		insert into t_tenant_info (
@@ -383,14 +372,5 @@
 		delete from t_tenant_info where 1=1
 		<include refid="whereSql" />
 	</delete>
-
-	<select id="getCountByUsername"
-		parameterType="com.talelife.base.component.organization.dao.entity.TenantInfo"
-		resultType="java.lang.Integer">
-		select count(*) from (
-			SELECT * from t_tenant_info where email=#{email}
-			union 
-			SELECT * from t_tenant_info where phone=#{phone}) t0;
-	</select>
 
 </mapper>

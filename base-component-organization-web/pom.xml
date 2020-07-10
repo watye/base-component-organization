@@ -36,6 +36,11 @@
 			<artifactId>cache-spring-boot-starter</artifactId>
 			<version>v1.0.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.talelife</groupId>
+			<artifactId>shardingjdbc-spring-boot-starter</artifactId>
+			<version>v1.0.0</version>
+		</dependency>
 	</dependencies>
 	
 	<repositories>

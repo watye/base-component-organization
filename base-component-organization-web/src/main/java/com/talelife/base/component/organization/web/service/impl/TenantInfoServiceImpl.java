@@ -51,7 +51,7 @@ public class TenantInfoServiceImpl implements TenantInfoService {
 	@Transactional(rollbackFor=Exception.class)
 	@Override
 	public Long register(TenantInfoRegister infoRegister) {
-		if(mapper.getCountByUsername(infoRegister.getPhone(), infoRegister.getEmail()) > 0){
+		if(alreadyRegistered(infoRegister.getPhone(), infoRegister.getEmail())){
 			ExceptionUtils.throwBizException(ExceptionCode.TENANT_EXIST.getCode(),ExceptionCode.TENANT_EXIST.getMessage());
 		}
 		TenantInfo tenantInfo = BeanUtils.map(infoRegister, TenantInfo.class);
@@ -91,7 +91,7 @@ public class TenantInfoServiceImpl implements TenantInfoService {
 
 	@Override
 	public TenantLoginInfo login(TenantLoginVO tenantLoginVO) {
-		TenantInfo tenantInfo = mapper.getByAccountPassword(tenantLoginVO.getAccount(), tenantLoginVO.getPassword());
+		TenantInfo tenantInfo = getByAccountPassword(tenantLoginVO.getAccount(), tenantLoginVO.getPassword());
 		if(Objects.isNull(tenantInfo)){
 			ExceptionUtils.throwParameterException(ExceptionCode.TENANT_ACCOUNT_PASSWORD_INCORRECT.getCode(), ExceptionCode.TENANT_ACCOUNT_PASSWORD_INCORRECT.getMessage());
 		}
@@ -133,11 +133,57 @@ public class TenantInfoServiceImpl implements TenantInfoService {
 		return null;
 	}
 	
+	/**
+	 * 保存租户登录信息
+	 * @param tenantLoginInfo 登录信息
+	 */
 	private void saveLoginInfo(TenantLoginInfo tenantLoginInfo) {
 		ValueOperations<String, Object> ops = redisTemplate.opsForValue();
 		ops.set(CacheUtils.getCacheKey(Constants.PROJECT_NAME, Constants.TENANT_INFO,tenantLoginInfo.getToken()), tenantLoginInfo, Constants.LOGIN_INFO_EXPIRE_TIME,TimeUnit.HOURS);
 		
 		ops.set(CacheUtils.getCacheKey(Constants.PROJECT_NAME, Constants.TENANT_TOKEN,tenantLoginInfo.getTenantId()+"-"+tenantLoginInfo.getEmail()), 
 				tenantLoginInfo.getToken(), Constants.TOKEN_EXPIRE_TIME,TimeUnit.MINUTES);
+	}
+	
+	/**
+	 * 根据账号密码查询租户
+	 * @param account 账号
+	 * @param password 密码
+	 * @return 租户
+	 */
+	private TenantInfo getByAccountPassword(String account, String password){
+		TenantInfo query = new TenantInfo();
+		query.setPhone(account);
+		query.setPassword(password);
+		query.setIsEnable(YesNoEnum.YES.getValue());
+		query.setIsDeleted(YesNoEnum.NO.getValue());
+		TenantInfo tenantInfo = mapper.get(query);
+		if(Objects.nonNull(tenantInfo)){
+			return tenantInfo;
+		}
+		
+		query.setPhone(null);
+		query.setEmail(account);
+		return  mapper.get(query);
+	}
+	
+	/**
+	 * 有无指定账号的租户
+	 * @param phone 手机号
+	 * @param email 邮箱
+	 * @return 存在返回true否则false
+	 */
+	private boolean alreadyRegistered(String phone, String email){
+		TenantInfo query = new TenantInfo();
+		query.setPhone(phone);
+		query.setIsDeleted(YesNoEnum.NO.getValue());
+		TenantInfo tenantInfo = mapper.get(query);
+		if(Objects.nonNull(tenantInfo)){
+			return true;
+		}
+		
+		query.setPhone(null);
+		query.setEmail(email);
+		return Objects.nonNull(mapper.get(query));
 	}
 }

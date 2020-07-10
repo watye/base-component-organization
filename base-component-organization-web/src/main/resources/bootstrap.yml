@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 45000
   max-http-header-size: 8KB #最大请求头
   tomcat:
     connection-timeout: 1000 #连接超时时间，默认无
