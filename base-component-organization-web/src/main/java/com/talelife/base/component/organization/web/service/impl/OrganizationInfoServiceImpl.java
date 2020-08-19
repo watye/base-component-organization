@@ -159,7 +159,7 @@ public class OrganizationInfoServiceImpl implements OrganizationInfoService {
 		EntityUtils.setModifyProperty(entity);
 		updateById(entity);
 		
-		updateChilrenOrgPath(new OrgInfoPath(sourceOrgInfo.getIdPath(),sourceOrgInfo.getNamePath(),entity.getIdPath(),entity.getNamePath()));
+		//updateChilrenOrgPath(new OrgInfoPath(sourceOrgInfo.getIdPath(),sourceOrgInfo.getNamePath(),entity.getIdPath(),entity.getNamePath()));
 	}
 
 	/**
