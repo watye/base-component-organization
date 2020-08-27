@@ -1,4 +1,4 @@
-FROM openjdk:8-jre
+FROM registry.talelife.com/library/alpine-glibc-jdk:v1.8
 VOLUME /tmp
 ADD ./base-component-organization-web/target/base-component-organization.jar base-component-organization.jar
 RUN bash -c 'touch /base-component-organization.jar'
