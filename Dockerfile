@@ -1,4 +1,4 @@
-FROM registry.talelife.com/library/alpine-glibc-jdk:v1.8
+FROM registry.talelife.com/library/alpine-glibc-jre:v1.8
 VOLUME /tmp
 ADD ./base-component-organization-web/target/base-component-organization.jar /base-component-organization.jar
 EXPOSE 40005
