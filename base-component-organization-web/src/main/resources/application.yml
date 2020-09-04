@@ -39,7 +39,7 @@ spring:
     port: 6379
 logging:
   level:
-    com: ERROR
+    com: DEBUG
 mybatis:
   mapper-locations: classpath*:/mapper/*Mapper.xml
   type-aliases-package: com.talelife.base.component.organization.dao.entity
